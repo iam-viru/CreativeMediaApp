@@ -28,7 +28,7 @@ A simple 3-page full-stack web app built with **Node.js**, **Express**, **EJS**,
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/YOUR-USERNAME/CreativeMediaApp.git
+git clone https://github.com/iam-viru/CreativeMediaApp.git
 cd CreativeMediaApp
 ```
 
