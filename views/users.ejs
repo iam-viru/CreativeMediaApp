@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Users</title>
+    <link rel="stylesheet" href="/css/output.css" />
+  </head>
+  <body class="bg-gray-100 min-h-screen">
+  <!-- Navbar -->
+<nav class="bg-white shadow-md sticky top-0 z-40 w-full border-b border-gray-200">
+  <div class="w-full flex justify-between items-center px-8 py-3">
+    <div class="flex items-center gap-6">
+      <h1 class="text-xl font-semibold text-gray-800">Creative Media Dashboard</h1>
+      <a href="/products" class="text-gray-700 hover:text-blue-600 font-medium">Products</a>
+      <a href="/users" class="text-gray-700 hover:text-blue-600 font-medium">Users</a>
+    </div>
+    <div class="flex items-center gap-4">
+      <span class="text-gray-700">👋 <%= user.name || user.username %></span>
+      <a href="/logout" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">Logout</a>
+    </div>
+  </div>
+</nav>
+
+
+    <div class="p-8">
+      <h2 class="text-lg font-semibold mb-4">Add New User</h2>
+      <form method="POST" action="/users/add" class="flex gap-4 mb-6">
+        <input
+          type="text"
+          name="username"
+          placeholder="Username"
+          class="border p-2 rounded w-40"
+          required
+        />
+        <input
+          type="text"
+          name="name"
+          placeholder="Name"
+          class="border p-2 rounded w-40"
+        />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          class="border p-2 rounded w-40"
+          required
+        />
+        <button
+          type="submit"
+          class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          Add
+        </button>
+      </form>
+
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white shadow rounded-lg overflow-hidden">
+          <thead class="bg-gray-200 text-gray-700">
+            <tr>
+              <th class="px-4 py-2 text-left">Username</th>
+              <th class="px-4 py-2 text-left">Name</th>
+              <th class="px-4 py-2 text-left">Last Login</th>
+              <th class="px-4 py-2 text-left">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% users.forEach(u => { %>
+            <tr class="border-b hover:bg-gray-50">
+              <form method="POST" action="/users/edit/<%= u.id %>">
+                <td class="px-4 py-2">
+                  <input
+                    type="text"
+                    name="username"
+                    value="<%= u.username %>"
+                    class="border p-1 rounded w-36"
+                  />
+                </td>
+                <td class="px-4 py-2">
+                  <input
+                    type="text"
+                    name="name"
+                    value="<%= u.name || '' %>"
+                    class="border p-1 rounded w-36"
+                  />
+                </td>
+                <td class="px-4 py-2"><%= u.last_login ? new Date(u.last_login).toLocaleString() : '-' %></td>
+                <td class="px-4 py-2 flex gap-2">
+                  <input
+                    type="password"
+                    name="password"
+                    placeholder="New Password"
+                    class="border p-1 rounded w-36"
+                  />
+                  <button
+                    type="submit"
+                    class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+                  >
+                    Save
+                  </button>
+                  <a
+                    href="/users/delete/<%= u.id %>"
+                    class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+                    onclick="return confirm('Delete this user?');"
+                  >
+                    Delete
+                  </a>
+                </td>
+              </form>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </body>
+</html>

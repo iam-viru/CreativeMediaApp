@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Products</title>
+    <link rel="stylesheet" href="/css/output.css" />
+  </head>
+  <body class="bg-gray-100 min-h-screen font-sans relative">
+    <!-- Top Loading Bar -->
+    <div id="loading-bar" class="fixed top-0 left-0 h-1 bg-blue-600 w-0 transition-all duration-500"></div>
+
+    <!-- Toast Notification -->
+    <div id="toast"
+         class="hidden fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg z-50">
+      <span id="toast-message"></span>
+    </div>
+
+    <!-- Navbar -->
+<nav class="bg-white shadow-md sticky top-0 z-40 w-full border-b border-gray-200">
+  <div class="w-full flex justify-between items-center px-8 py-3">
+        <div class="flex items-center gap-6">
+          <h1 class="text-xl font-semibold text-gray-800">Creative Media Dashboard</h1>
+          <a href="/products" class="text-gray-700 hover:text-blue-600 font-medium">Products</a>
+          <a href="/users" class="text-gray-700 hover:text-blue-600 font-medium">Users</a>
+        </div>
+        <div class="flex items-center gap-4">
+             <!-- Profile Image -->
+  <img
+    src="<%= user.profile_image || '/images/default-avatar.png' %>"
+    alt="User Avatar"
+    class="w-9 h-9 rounded-full border border-gray-300 object-cover"
+  />
+          <span class="text-gray-700">👋 <%= user.name || user.username %></span>
+<a href="/logout" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">Logout</a>
+
+        </div>
+      </div>
+    </nav>
+
+    <!-- Search -->
+    <div class="p-6">
+      <form method="GET" action="/products" class="mb-4 flex items-center gap-2">
+        <input
+          type="text"
+          name="search"
+          placeholder="Search by SKU or Product Name"
+          value="<%= search || '' %>"
+          class="border rounded p-2 w-80"
+        />
+        <button
+          type="submit"
+          class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          Search
+        </button>
+        <% if (search) { %>
+        <a href="/products" class="text-gray-600 underline">Clear</a>
+        <% } %>
+      </form>
+
+      <!-- Products Table -->
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white shadow rounded-lg overflow-hidden">
+          <thead class="bg-gray-200 text-gray-700">
+            <tr>
+              <th class="px-4 py-2 text-left">SKU</th>
+              <th class="px-4 py-2 text-left">Product Name</th>
+              <th class="px-4 py-2 text-left">Price ($)</th>
+              <th class="px-4 py-2 text-left">Qty</th>
+              <th class="px-4 py-2 text-left">Min Price ($)</th>
+              <th class="px-4 py-2 text-left">Update Interval</th>
+              <th class="px-4 py-2 text-left">Last Update</th>
+              <th class="px-4 py-2 text-left">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (products.length === 0) { %>
+              <tr><td colspan="8" class="text-center py-6 text-gray-500">No products found</td></tr>
+            <% } %>
+            <% products.forEach(p => { %>
+            <tr class="border-b hover:bg-gray-50">
+              <form method="POST" action="/products/update/<%= p.id %>" class="update-form">
+                <td class="px-4 py-2"><%= p.sku %></td>
+                <td class="px-4 py-2"><%= p.product_name %></td>
+                <td class="px-4 py-2"><%= parseFloat(p.price).toFixed(2) %></td>
+                <td class="px-4 py-2">
+                  <input type="number" name="qty" value="<%= p.qty %>"
+                    class="border p-1 rounded w-20 text-center" />
+                </td>
+                <td class="px-4 py-2">
+                  <input type="number" step="0.01" name="minimum_price" value="<%= p.minimum_price %>"
+                    class="border p-1 rounded w-24 text-center" />
+                </td>
+                <td class="px-4 py-2">
+                  <select name="update_interval" class="border p-1 rounded">
+                    <option <%= p.update_interval === '12 hours' ? 'selected' : '' %>>12 hours</option>
+                    <option <%= p.update_interval === '13 hours' ? 'selected' : '' %>>13 hours</option>
+                    <option <%= p.update_interval === '14 hours' ? 'selected' : '' %>>14 hours</option>
+                  </select>
+                </td>
+                <td class="px-4 py-2"><%= new Date(p.last_update).toLocaleString() %></td>
+                <td class="px-4 py-2">
+                  <button type="submit"
+                          class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
+                    Update
+                  </button>
+                </td>
+              </form>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <% if (typeof totalPages !== 'undefined' && totalPages > 1) { %>
+      <div class="flex justify-center mt-6 gap-2">
+        <% for (let i = 1; i <= totalPages; i++) { %>
+          <% if (i === currentPage) { %>
+            <span class="bg-blue-600 text-white px-3 py-1 rounded"><%= i %></span>
+          <% } else { %>
+            <a href="/products?page=<%= i %><%= search ? '&search=' + encodeURIComponent(search) : '' %>"
+               class="bg-gray-200 text-gray-800 px-3 py-1 rounded hover:bg-gray-300"><%= i %></a>
+          <% } %>
+        <% } %>
+      </div>
+      <% } %>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+      // === Top Loading Bar ===
+      function showLoadingBar() {
+        const bar = document.getElementById('loading-bar');
+        bar.style.width = '0%';
+        bar.classList.remove('hidden');
+        setTimeout(() => (bar.style.width = '80%'), 50);
+      }
+
+      function hideLoadingBar() {
+        const bar = document.getElementById('loading-bar');
+        bar.style.width = '100%';
+        setTimeout(() => {
+          bar.style.width = '0%';
+          bar.classList.add('hidden');
+        }, 500);
+      }
+
+      document.querySelectorAll('.update-form').forEach(form => {
+        form.addEventListener('submit', () => showLoadingBar());
+      });
+
+      document.querySelectorAll('a').forEach(link => {
+        const isExternal = link.target === '_blank' || link.href.startsWith('mailto:');
+        if (!isExternal) {
+          link.addEventListener('click', e => {
+            if (!link.href.includes('#')) showLoadingBar();
+          });
+        }
+      });
+
+      window.addEventListener('load', hideLoadingBar);
+
+      // === Toasts ===
+      const params = new URLSearchParams(window.location.search);
+      const status = params.get('status');
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-message');
+
+      if (status === 'success') {
+        toast.classList.remove('hidden', 'bg-red-500');
+        toast.classList.add('bg-green-500');
+        toastMsg.textContent = '✅ Product updated successfully!';
+      } else if (status === 'error') {
+        toast.classList.remove('hidden', 'bg-green-500');
+        toast.classList.add('bg-red-500');
+        toastMsg.textContent = '❌ Error updating product.';
+      }
+
+      if (status) {
+        setTimeout(() => {
+          toast.classList.add('hidden');
+          window.history.replaceState({}, document.title, '/products');
+        }, 3000);
+      }
+    </script>
+  </body>
+</html>
