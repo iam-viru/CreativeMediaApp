@@ -38,47 +38,33 @@
     </div>
   </nav>
 
-  <!-- Main Container -->
+  <!-- Main Content -->
   <div class="p-6 space-y-4">
-
-    <!-- === Search Form === -->
-    <form action="/products" method="GET"
-          class="flex flex-wrap justify-between items-center gap-3 mb-4">
-      <div class="flex items-center gap-2">
-        <input type="text" name="search"
-               placeholder="Search by SKU or Product Name"
-               value="<%= search || '' %>"
-               class="border rounded p-2 w-80" />
-        <button type="submit"
-                class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-          Search
-        </button>
+    <form action="/products" method="GET" class="flex justify-between mb-4">
+      <div class="flex gap-2 items-center">
+        <input type="text" name="search" placeholder="Search by SKU or Product Name"
+               value="<%= search || '' %>" class="border rounded p-2 w-80">
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Search</button>
         <% if (search) { %>
           <a href="/products" class="text-gray-600 underline">Clear</a>
         <% } %>
       </div>
     </form>
 
-    <!-- === Batch Update Form === -->
+    <!-- ✅ Batch update form -->
     <form method="POST" action="/products/batchUpdate" id="batchForm">
-      <!-- Top Action Bar -->
       <div class="flex justify-between items-center mb-3">
         <h2 class="text-lg font-semibold text-gray-700">Product List</h2>
         <button type="submit" id="batchUpdateBtn"
-                class="bg-green-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-                disabled>
-          Batch Update
-        </button>
+                class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50"
+                disabled>Batch Update</button>
       </div>
 
-      <!-- Product Table -->
       <div class="overflow-x-auto">
         <table class="min-w-full bg-white shadow rounded-lg overflow-hidden">
           <thead class="bg-gray-200 text-gray-700">
             <tr>
-              <th class="px-4 py-2 text-left">
-                <input type="checkbox" id="selectAll" class="cursor-pointer" />
-              </th>
+              <th class="px-4 py-2 text-left"><input type="checkbox" id="selectAll" class="cursor-pointer"></th>
               <th class="px-4 py-2 text-left">SKU</th>
               <th class="px-4 py-2 text-left">Product Name</th>
               <th class="px-4 py-2 text-left">Price ($)</th>
@@ -96,23 +82,22 @@
               <% products.forEach(p => { %>
               <tr class="border-b hover:bg-gray-50" data-product-id="<%= p.id %>">
                 <td class="px-4 py-2 text-center">
-                  <input type="checkbox" name="selected[]" value="<%= p.id %>"
-                         class="selectRow cursor-pointer" />
+                  <input type="checkbox" name="selected[]" value="<%= p.id %>" class="selectRow cursor-pointer">
                 </td>
                 <td class="px-4 py-2"><%= p.sku %></td>
                 <td class="px-4 py-2"><%= p.product_name %></td>
                 <td class="px-4 py-2"><%= parseFloat(p.price).toFixed(2) %></td>
                 <td class="px-4 py-2">
-                  <input type="hidden" name="id[]" value="<%= p.id %>" />
-                  <input type="number" name="qty" value="<%= p.qty %>"
+                  <input type="hidden" name="id[]" value="<%= p.id %>">
+                  <input type="number" name="qty[]" value="<%= p.qty %>"
                          class="border p-1 rounded w-20 text-center" />
                 </td>
                 <td class="px-4 py-2">
-                  <input type="number" step="0.01" name="minimum_price" value="<%= p.minimum_price %>"
+                  <input type="number" step="0.01" name="minimum_price[]" value="<%= p.minimum_price %>"
                          class="border p-1 rounded w-24 text-center" />
                 </td>
                 <td class="px-4 py-2">
-                  <select name="update_interval" class="border p-1 rounded">
+                  <select name="update_interval[]" class="border p-1 rounded">
                     <option <%= p.update_interval === '12 hours' ? 'selected' : '' %>>12 hours</option>
                     <option <%= p.update_interval === '13 hours' ? 'selected' : '' %>>13 hours</option>
                     <option <%= p.update_interval === '14 hours' ? 'selected' : '' %>>14 hours</option>
@@ -132,86 +117,23 @@
         </table>
       </div>
     </form>
-
-    <!-- Pagination -->
-    <% if (typeof totalPages !== 'undefined' && totalPages > 1) { %>
-    <div class="flex justify-center mt-6 gap-2">
-      <% for (let i = 1; i <= totalPages; i++) { %>
-        <% if (i === currentPage) { %>
-          <span class="bg-blue-600 text-white px-3 py-1 rounded"><%= i %></span>
-        <% } else { %>
-          <a href="/products?page=<%= i %><%= search ? '&search=' + encodeURIComponent(search) : '' %>"
-             class="bg-gray-200 text-gray-800 px-3 py-1 rounded hover:bg-gray-300"><%= i %></a>
-        <% } %>
-      <% } %>
-    </div>
-    <% } %>
   </div>
 
-  <!-- === Scripts === -->
+  <!-- ✅ Script section -->
   <script>
-    // --- Loading Bar ---
     function showLoadingBar() {
       const bar = document.getElementById('loading-bar');
       bar.style.width = '0%';
       bar.classList.remove('hidden');
       setTimeout(() => (bar.style.width = '80%'), 50);
     }
+
     function hideLoadingBar() {
       const bar = document.getElementById('loading-bar');
       bar.style.width = '100%';
-      setTimeout(() => {
-        bar.style.width = '0%';
-        bar.classList.add('hidden');
-      }, 500);
-    }
-    window.addEventListener('load', hideLoadingBar);
-
-    // --- Select All & Highlight Logic ---
-    const selectAll = document.getElementById('selectAll');
-    const checkboxes = document.querySelectorAll('.selectRow');
-    const batchBtn = document.getElementById('batchUpdateBtn');
-
-    selectAll.addEventListener('change', (e) => {
-      checkboxes.forEach(cb => {
-        cb.checked = e.target.checked;
-        toggleRowHighlight(cb);
-      });
-      toggleBatchButton();
-    });
-
-    checkboxes.forEach(cb => cb.addEventListener('change', () => {
-      toggleRowHighlight(cb);
-      toggleBatchButton();
-    }));
-
-    function toggleRowHighlight(cb) {
-      const row = cb.closest('tr');
-      if (cb.checked) row.classList.add('bg-blue-50');
-      else row.classList.remove('bg-blue-50');
+      setTimeout(() => { bar.style.width = '0%'; bar.classList.add('hidden'); }, 500);
     }
 
-    function toggleBatchButton() {
-      const anyChecked = [...checkboxes].some(cb => cb.checked);
-      batchBtn.disabled = !anyChecked;
-    }
-
-    // --- Batch Form Confirmation ---
-    document.getElementById('batchForm').addEventListener('submit', (e) => {
-      const selected = document.querySelectorAll('.selectRow:checked');
-      if (selected.length === 0) {
-        alert('Please select at least one product to update.');
-        e.preventDefault();
-        return;
-      }
-      if (!confirm(`Update ${selected.length} selected product(s)?`)) {
-        e.preventDefault();
-      } else {
-        showLoadingBar();
-      }
-    });
-
-    // --- Toast Function ---
     function showToast(message, success) {
       const toast = document.getElementById('toast');
       const toastMsg = document.getElementById('toast-message');
@@ -222,62 +144,102 @@
       setTimeout(() => toast.classList.add('hidden'), 3000);
     }
 
-    // --- Inline Single Row Update (AJAX) ---
-     // --- Inline Single Row Update (AJAX) ---
- // --- Inline Single Row Update (AJAX) ---
-document.querySelectorAll('.updateBtn').forEach(btn => {
-  btn.addEventListener('click', async (e) => {
-    const row = e.target.closest('tr');
-    const id = row.dataset.productId;
-    const qty = row.querySelector('input[name="qty"]').value;
-    const minimum_price = row.querySelector('input[name="minimum_price"]').value;
-    const update_interval = row.querySelector('select[name="update_interval"]').value;
-
-    showLoadingBar();
-    btn.disabled = true;
-    btn.textContent = 'Saving...';
-
-    try {
-      const res = await fetch(`/products/update/${id}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        credentials: 'include',
-        body: JSON.stringify({ qty, minimum_price, update_interval })
+    // === Checkbox selection ===
+    const selectAll = document.getElementById('selectAll');
+    const checkboxes = document.querySelectorAll('.selectRow');
+    const batchBtn = document.getElementById('batchUpdateBtn');
+    selectAll.addEventListener('change', (e) => {
+      checkboxes.forEach(cb => {
+        cb.checked = e.target.checked;
+        toggleRowHighlight(cb);
       });
-
-      const success = await res.json(); // 🔥 returns true or false directly
-      hideLoadingBar();
-
-      if (success) {
-        showToast('Product updated successfully!', true);
-        row.classList.add('bg-green-50');
-        const now = new Date();
-        const lastUpdateCell = row.querySelector('.last-update');
-        if (lastUpdateCell) lastUpdateCell.textContent = now.toLocaleString();
-        setTimeout(() => row.classList.remove('bg-green-50'), 1200);
-      } else {
-        showToast('Error updating product.', false);
-      }
-    } catch (err) {
-      console.error('Update failed:', err);
-      hideLoadingBar();
-      //showToast('Unexpected error during update.', false);
+      toggleBatchButton();
+    });
+    checkboxes.forEach(cb => cb.addEventListener('change', () => {
+      toggleRowHighlight(cb);
+      toggleBatchButton();
+    }));
+    function toggleRowHighlight(cb) {
+      const row = cb.closest('tr');
+      if (cb.checked) row.classList.add('bg-blue-50');
+      else row.classList.remove('bg-blue-50');
+    }
+    function toggleBatchButton() {
+      const anyChecked = [...checkboxes].some(cb => cb.checked);
+      batchBtn.disabled = !anyChecked;
     }
 
-    btn.disabled = false;
-    btn.textContent = 'Update';
-  });
+    // === Inline Single Row AJAX Update ===
+    document.querySelectorAll('.updateBtn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const row = e.target.closest('tr');
+        const id = row.dataset.productId;
+        const qty = row.querySelector('input[name="qty[]"]').value;
+        const minimum_price = row.querySelector('input[name="minimum_price[]"]').value;
+        const update_interval = row.querySelector('select[name="update_interval[]"]').value;
+
+        showLoadingBar();
+        btn.disabled = true;
+        btn.textContent = 'Saving...';
+
+        try {
+          const res = await fetch(`/products/update/${id}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ qty, minimum_price, update_interval })
+          });
+
+          const result = await res.json();
+          hideLoadingBar();
+
+          if (result === true) {
+            showToast('✅ Product updated successfully!', true);
+            row.classList.add('bg-green-50');
+            const now = new Date();
+            const lastUpdateCell = row.querySelector('.last-update');
+            if (lastUpdateCell) lastUpdateCell.textContent = now.toLocaleString();
+            setTimeout(() => row.classList.remove('bg-green-50'), 1200);
+          } else {
+            showToast('❌ Error updating product.', false);
+          }
+        } catch (err) {
+          console.error('Update failed:', err);
+          hideLoadingBar();
+          showToast('⚠️ Unexpected error during update.', false);
+        }
+
+        btn.disabled = false;
+        btn.textContent = 'Update';
+      });
+    });
+
+    // === Toast Notification for batch updates ===
+document.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  const status = params.get('status');
+
+  if (status) {
+    const toast = document.getElementById('toast');
+    const toastMsg = document.getElementById('toast-message');
+
+    toast.classList.remove('hidden');
+    if (status === 'success') {
+      toast.classList.add('bg-green-500');
+      toastMsg.textContent = '✅ Batch update completed successfully!';
+    } else {
+      toast.classList.add('bg-red-500');
+      toastMsg.textContent = '❌ Error during batch update.';
+    }
+
+    // Keep toast visible for 3s, then hide and clean URL
+    setTimeout(() => {
+      toast.classList.add('hidden');
+      window.history.replaceState({}, document.title, '/products');
+    }, 3000);
+  }
 });
 
-
-    // --- Toast for batch update redirect ---
-    const params = new URLSearchParams(window.location.search);
-    const status = params.get('status');
-    if (status === 'success') showToast('Batch update completed successfully!', true);
-    else if (status === 'error') showToast('Error during batch update.', false);
   </script>
 </body>
 </html>
