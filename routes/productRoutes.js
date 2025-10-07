@@ -1,13 +1,14 @@
 // routes/productRoutes.js
 const express = require('express');
 const router = express.Router();
-const { listProducts, updateProduct } = require('../controllers/productController');
+const productController = require('../controllers/productController');
 
 // GET: list all products
-router.get('/', listProducts);
+router.get('/', productController.listProducts);
 
 // AJAX search API
 router.get('/search/ajax', (req, res) => {
+  const db = require('../config/db'); // make sure db is available
   const term = `%${req.query.q || ''}%`;
   const query = `
     SELECT * FROM products
@@ -26,8 +27,10 @@ router.get('/search/ajax', (req, res) => {
   });
 });
 
-
 // POST: update editable fields
-router.post('/update/:id', updateProduct);
+router.post('/update/:id', productController.updateProduct);
+
+// ✅ Batch update
+router.post('/batchUpdate', productController.batchUpdate);
 
 module.exports = router;

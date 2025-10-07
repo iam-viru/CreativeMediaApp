@@ -17,53 +17,73 @@
     </div>
 
     <!-- Navbar -->
-<nav class="bg-white shadow-md sticky top-0 z-40 w-full border-b border-gray-200">
-  <div class="w-full flex justify-between items-center px-8 py-3">
+    <nav class="bg-white shadow sticky top-0 z-40 w-full border-b border-gray-200">
+      <div class="w-full flex justify-between items-center px-8 py-3">
         <div class="flex items-center gap-6">
           <h1 class="text-xl font-semibold text-gray-800">Creative Media Dashboard</h1>
           <a href="/products" class="text-gray-700 hover:text-blue-600 font-medium">Products</a>
           <a href="/users" class="text-gray-700 hover:text-blue-600 font-medium">Users</a>
         </div>
-        <div class="flex items-center gap-4">
-             <!-- Profile Image -->
-  <img
-    src="<%= user.profile_image || '/images/default-avatar.png' %>"
-    alt="User Avatar"
-    class="w-9 h-9 rounded-full border border-gray-300 object-cover"
-  />
-          <span class="text-gray-700">👋 <%= user.name || user.username %></span>
-<a href="/logout" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">Logout</a>
-
+        <div class="flex items-center gap-3">
+          <img src="<%= user.profile_image || '/images/default-avatar.png' %>"
+               alt="User Avatar"
+               class="w-9 h-9 rounded-full border border-gray-300 object-cover" />
+          <span class="text-gray-700 font-medium"><%= user.name || user.username %></span>
+          <a href="/logout"
+             class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition">
+             Logout
+          </a>
         </div>
       </div>
     </nav>
 
-    <!-- Search -->
+    <!-- Search + Batch Update -->
     <div class="p-6">
-      <form method="GET" action="/products" class="mb-4 flex items-center gap-2">
-        <input
-          type="text"
-          name="search"
-          placeholder="Search by SKU or Product Name"
-          value="<%= search || '' %>"
-          class="border rounded p-2 w-80"
-        />
-        <button
-          type="submit"
-          class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          Search
-        </button>
-        <% if (search) { %>
-        <a href="/products" class="text-gray-600 underline">Clear</a>
-        <% } %>
+      <form method="POST" action="/products/batchUpdate" id="batchForm"
+            class="mb-4 flex flex-wrap justify-between items-center gap-3">
+
+        <!-- Left: Search box -->
+        <div class="flex items-center gap-2">
+          <input
+            type="text"
+            name="search"
+            placeholder="Search by SKU or Product Name"
+            value="<%= search || '' %>"
+            class="border rounded p-2 w-80"
+            formaction="/products"
+            formmethod="GET"
+          />
+          <button type="submit"
+                  formaction="/products"
+                  formmethod="GET"
+                  class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+            Search
+          </button>
+          <% if (search) { %>
+          <a href="/products" class="text-gray-600 underline">Clear</a>
+          <% } %>
+        </div>
+
+        <!-- Right: Batch Update button -->
+        <div class="flex items-center gap-2">
+          <button
+            type="submit"
+            id="batchUpdateBtn"
+            class="bg-green-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+            disabled>
+            Batch Update
+          </button>
+        </div>
       </form>
 
-      <!-- Products Table -->
+      <!-- Product Table -->
       <div class="overflow-x-auto">
         <table class="min-w-full bg-white shadow rounded-lg overflow-hidden">
           <thead class="bg-gray-200 text-gray-700">
             <tr>
+              <th class="px-4 py-2 text-left">
+                <input type="checkbox" id="selectAll" class="cursor-pointer">
+              </th>
               <th class="px-4 py-2 text-left">SKU</th>
               <th class="px-4 py-2 text-left">Product Name</th>
               <th class="px-4 py-2 text-left">Price ($)</th>
@@ -71,7 +91,6 @@
               <th class="px-4 py-2 text-left">Min Price ($)</th>
               <th class="px-4 py-2 text-left">Update Interval</th>
               <th class="px-4 py-2 text-left">Last Update</th>
-              <th class="px-4 py-2 text-left">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -79,35 +98,31 @@
               <tr><td colspan="8" class="text-center py-6 text-gray-500">No products found</td></tr>
             <% } %>
             <% products.forEach(p => { %>
-            <tr class="border-b hover:bg-gray-50">
-              <form method="POST" action="/products/update/<%= p.id %>" class="update-form">
+              <tr class="border-b hover:bg-gray-50">
+                <td class="px-4 py-2 text-center">
+                  <input type="checkbox" name="selected[]" value="<%= p.id %>" class="selectRow cursor-pointer">
+                </td>
                 <td class="px-4 py-2"><%= p.sku %></td>
                 <td class="px-4 py-2"><%= p.product_name %></td>
                 <td class="px-4 py-2"><%= parseFloat(p.price).toFixed(2) %></td>
                 <td class="px-4 py-2">
-                  <input type="number" name="qty" value="<%= p.qty %>"
-                    class="border p-1 rounded w-20 text-center" />
+                  <input type="hidden" name="id[]" value="<%= p.id %>">
+                  <input type="number" name="qty[]" value="<%= p.qty %>"
+                         class="border p-1 rounded w-20 text-center" />
                 </td>
                 <td class="px-4 py-2">
-                  <input type="number" step="0.01" name="minimum_price" value="<%= p.minimum_price %>"
-                    class="border p-1 rounded w-24 text-center" />
+                  <input type="number" step="0.01" name="minimum_price[]" value="<%= p.minimum_price %>"
+                         class="border p-1 rounded w-24 text-center" />
                 </td>
                 <td class="px-4 py-2">
-                  <select name="update_interval" class="border p-1 rounded">
+                  <select name="update_interval[]" class="border p-1 rounded">
                     <option <%= p.update_interval === '12 hours' ? 'selected' : '' %>>12 hours</option>
                     <option <%= p.update_interval === '13 hours' ? 'selected' : '' %>>13 hours</option>
                     <option <%= p.update_interval === '14 hours' ? 'selected' : '' %>>14 hours</option>
                   </select>
                 </td>
                 <td class="px-4 py-2"><%= new Date(p.last_update).toLocaleString() %></td>
-                <td class="px-4 py-2">
-                  <button type="submit"
-                          class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
-                    Update
-                  </button>
-                </td>
-              </form>
-            </tr>
+              </tr>
             <% }) %>
           </tbody>
         </table>
@@ -147,22 +162,55 @@
         }, 500);
       }
 
-      document.querySelectorAll('.update-form').forEach(form => {
-        form.addEventListener('submit', () => showLoadingBar());
+      window.addEventListener('load', hideLoadingBar);
+
+      // === Select All Logic ===
+      const selectAll = document.getElementById('selectAll');
+      const checkboxes = document.querySelectorAll('.selectRow');
+      const batchBtn = document.getElementById('batchUpdateBtn');
+
+      selectAll.addEventListener('change', (e) => {
+        checkboxes.forEach(cb => {
+          cb.checked = e.target.checked;
+          toggleRowHighlight(cb);
+        });
+        toggleBatchButton();
       });
 
-      document.querySelectorAll('a').forEach(link => {
-        const isExternal = link.target === '_blank' || link.href.startsWith('mailto:');
-        if (!isExternal) {
-          link.addEventListener('click', e => {
-            if (!link.href.includes('#')) showLoadingBar();
-          });
+      checkboxes.forEach(cb => cb.addEventListener('change', () => {
+        toggleRowHighlight(cb);
+        toggleBatchButton();
+      }));
+
+      // Highlight selected rows
+      function toggleRowHighlight(cb) {
+        const row = cb.closest('tr');
+        if (cb.checked) row.classList.add('bg-blue-50');
+        else row.classList.remove('bg-blue-50');
+      }
+
+      // Enable/Disable Batch Update Button
+      function toggleBatchButton() {
+        const anyChecked = [...checkboxes].some(cb => cb.checked);
+        batchBtn.disabled = !anyChecked;
+      }
+
+      // === Confirmation Before Submit ===
+      document.getElementById('batchForm').addEventListener('submit', (e) => {
+        const selected = document.querySelectorAll('.selectRow:checked');
+        if (selected.length === 0) {
+          alert('Please select at least one product to update.');
+          e.preventDefault();
+          return;
+        }
+        if (!confirm(`Update ${selected.length} selected product(s)?`)) {
+          e.preventDefault();
+        } else {
+          showLoadingBar();
         }
       });
 
-      window.addEventListener('load', hideLoadingBar);
-
-      // === Toasts ===
+      // === Toast Notification ===
       const params = new URLSearchParams(window.location.search);
       const status = params.get('status');
       const toast = document.getElementById('toast');
@@ -171,11 +219,11 @@
       if (status === 'success') {
         toast.classList.remove('hidden', 'bg-red-500');
         toast.classList.add('bg-green-500');
-        toastMsg.textContent = '✅ Product updated successfully!';
+        toastMsg.textContent = 'Batch update completed successfully!';
       } else if (status === 'error') {
         toast.classList.remove('hidden', 'bg-green-500');
         toast.classList.add('bg-red-500');
-        toastMsg.textContent = '❌ Error updating product.';
+        toastMsg.textContent = 'Error during batch update.';
       }
 
       if (status) {
