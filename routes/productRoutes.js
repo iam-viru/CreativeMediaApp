@@ -6,31 +6,13 @@ const productController = require('../controllers/productController');
 // GET: list all products
 router.get('/', productController.listProducts);
 
-// AJAX search API
-router.get('/search/ajax', (req, res) => {
-  const db = require('../config/db'); // make sure db is available
-  const term = `%${req.query.q || ''}%`;
-  const query = `
-    SELECT * FROM products
-    WHERE product_name LIKE ? OR sku LIKE ?
-    ORDER BY id ASC
-    LIMIT 20
-  `;
-  db.query(query, [term, term], (err, results) => {
-    if (err) return res.status(500).json({ error: 'DB Error' });
+// AJAX search API (moved to controller for consistency)
+router.get('/search/ajax', productController.searchAjax);
 
-    results.forEach(r => {
-      r.price = parseFloat(r.price);
-      r.minimum_price = parseFloat(r.minimum_price);
-    });
-    res.json(results);
-  });
-});
-
-// POST: update editable fields
+// Single-row update
 router.post('/update/:id', productController.updateProduct);
 
-// ✅ Batch update
+// Batch update (supports checkbox-selected or single-row "batch" posts)
 router.post('/batchUpdate', productController.batchUpdate);
 
 module.exports = router;

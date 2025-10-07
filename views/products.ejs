@@ -1,80 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Products</title>
-    <link rel="stylesheet" href="/css/output.css" />
-  </head>
-  <body class="bg-gray-100 min-h-screen font-sans relative">
-    <!-- Top Loading Bar -->
-    <div id="loading-bar" class="fixed top-0 left-0 h-1 bg-blue-600 w-0 transition-all duration-500"></div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Products</title>
+  <link rel="stylesheet" href="/css/output.css" />
+</head>
+<body class="bg-gray-100 min-h-screen font-sans relative">
 
-    <!-- Toast Notification -->
-    <div id="toast"
-         class="hidden fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg z-50">
-      <span id="toast-message"></span>
-    </div>
+  <!-- Loading Bar -->
+  <div id="loading-bar" class="fixed top-0 left-0 h-1 bg-blue-600 w-0 transition-all duration-500"></div>
 
-    <!-- Navbar -->
-    <nav class="bg-white shadow sticky top-0 z-40 w-full border-b border-gray-200">
-      <div class="w-full flex justify-between items-center px-8 py-3">
-        <div class="flex items-center gap-6">
-          <h1 class="text-xl font-semibold text-gray-800">Creative Media Dashboard</h1>
-          <a href="/products" class="text-gray-700 hover:text-blue-600 font-medium">Products</a>
-          <a href="/users" class="text-gray-700 hover:text-blue-600 font-medium">Users</a>
-        </div>
-        <div class="flex items-center gap-3">
-          <img src="<%= user.profile_image || '/images/default-avatar.png' %>"
-               alt="User Avatar"
-               class="w-9 h-9 rounded-full border border-gray-300 object-cover" />
-          <span class="text-gray-700 font-medium"><%= user.name || user.username %></span>
-          <a href="/logout"
-             class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition">
-             Logout
-          </a>
-        </div>
+  <!-- Toast Notification -->
+  <div id="toast"
+       class="hidden fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg z-50">
+    <span id="toast-message"></span>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="bg-white shadow sticky top-0 z-40 w-full border-b border-gray-200">
+    <div class="w-full flex justify-between items-center px-8 py-3">
+      <div class="flex items-center gap-6">
+        <h1 class="text-xl font-semibold text-gray-800">Creative Media Dashboard</h1>
+        <a href="/products" class="text-gray-700 hover:text-blue-600 font-medium">Products</a>
+        <a href="/users" class="text-gray-700 hover:text-blue-600 font-medium">Users</a>
       </div>
-    </nav>
+      <div class="flex items-center gap-3">
+        <img src="<%= user.profile_image || '/images/default-avatar.png' %>"
+             alt="User Avatar"
+             class="w-9 h-9 rounded-full border border-gray-300 object-cover" />
+        <span class="text-gray-700 font-medium"><%= user.name || user.username %></span>
+        <a href="/logout"
+           class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition">
+          Logout
+        </a>
+      </div>
+    </div>
+  </nav>
 
-    <!-- Search + Batch Update -->
-    <div class="p-6">
-      <form method="POST" action="/products/batchUpdate" id="batchForm"
-            class="mb-4 flex flex-wrap justify-between items-center gap-3">
+  <!-- Main Container -->
+  <div class="p-6 space-y-4">
 
-        <!-- Left: Search box -->
-        <div class="flex items-center gap-2">
-          <input
-            type="text"
-            name="search"
-            placeholder="Search by SKU or Product Name"
-            value="<%= search || '' %>"
-            class="border rounded p-2 w-80"
-            formaction="/products"
-            formmethod="GET"
-          />
-          <button type="submit"
-                  formaction="/products"
-                  formmethod="GET"
-                  class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-            Search
-          </button>
-          <% if (search) { %>
+    <!-- === Search Form === -->
+    <form action="/products" method="GET"
+          class="flex flex-wrap justify-between items-center gap-3 mb-4">
+      <div class="flex items-center gap-2">
+        <input type="text" name="search"
+               placeholder="Search by SKU or Product Name"
+               value="<%= search || '' %>"
+               class="border rounded p-2 w-80" />
+        <button type="submit"
+                class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+          Search
+        </button>
+        <% if (search) { %>
           <a href="/products" class="text-gray-600 underline">Clear</a>
-          <% } %>
-        </div>
+        <% } %>
+      </div>
+    </form>
 
-        <!-- Right: Batch Update button -->
-        <div class="flex items-center gap-2">
-          <button
-            type="submit"
-            id="batchUpdateBtn"
-            class="bg-green-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-            disabled>
-            Batch Update
-          </button>
-        </div>
-      </form>
+    <!-- === Batch Update Form === -->
+    <form method="POST" action="/products/batchUpdate" id="batchForm">
+      <!-- Top Action Bar -->
+      <div class="flex justify-between items-center mb-3">
+        <h2 class="text-lg font-semibold text-gray-700">Product List</h2>
+        <button type="submit" id="batchUpdateBtn"
+                class="bg-green-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+                disabled>
+          Batch Update
+        </button>
+      </div>
 
       <!-- Product Table -->
       <div class="overflow-x-auto">
@@ -82,7 +77,7 @@
           <thead class="bg-gray-200 text-gray-700">
             <tr>
               <th class="px-4 py-2 text-left">
-                <input type="checkbox" id="selectAll" class="cursor-pointer">
+                <input type="checkbox" id="selectAll" class="cursor-pointer" />
               </th>
               <th class="px-4 py-2 text-left">SKU</th>
               <th class="px-4 py-2 text-left">Product Name</th>
@@ -91,147 +86,198 @@
               <th class="px-4 py-2 text-left">Min Price ($)</th>
               <th class="px-4 py-2 text-left">Update Interval</th>
               <th class="px-4 py-2 text-left">Last Update</th>
+              <th class="px-4 py-2 text-center">Action</th>
             </tr>
           </thead>
           <tbody>
             <% if (products.length === 0) { %>
-              <tr><td colspan="8" class="text-center py-6 text-gray-500">No products found</td></tr>
-            <% } %>
-            <% products.forEach(p => { %>
-              <tr class="border-b hover:bg-gray-50">
+              <tr><td colspan="9" class="text-center py-6 text-gray-500">No products found</td></tr>
+            <% } else { %>
+              <% products.forEach(p => { %>
+              <tr class="border-b hover:bg-gray-50" data-product-id="<%= p.id %>">
                 <td class="px-4 py-2 text-center">
-                  <input type="checkbox" name="selected[]" value="<%= p.id %>" class="selectRow cursor-pointer">
+                  <input type="checkbox" name="selected[]" value="<%= p.id %>"
+                         class="selectRow cursor-pointer" />
                 </td>
                 <td class="px-4 py-2"><%= p.sku %></td>
                 <td class="px-4 py-2"><%= p.product_name %></td>
                 <td class="px-4 py-2"><%= parseFloat(p.price).toFixed(2) %></td>
                 <td class="px-4 py-2">
-                  <input type="hidden" name="id[]" value="<%= p.id %>">
-                  <input type="number" name="qty[]" value="<%= p.qty %>"
+                  <input type="hidden" name="id[]" value="<%= p.id %>" />
+                  <input type="number" name="qty" value="<%= p.qty %>"
                          class="border p-1 rounded w-20 text-center" />
                 </td>
                 <td class="px-4 py-2">
-                  <input type="number" step="0.01" name="minimum_price[]" value="<%= p.minimum_price %>"
+                  <input type="number" step="0.01" name="minimum_price" value="<%= p.minimum_price %>"
                          class="border p-1 rounded w-24 text-center" />
                 </td>
                 <td class="px-4 py-2">
-                  <select name="update_interval[]" class="border p-1 rounded">
+                  <select name="update_interval" class="border p-1 rounded">
                     <option <%= p.update_interval === '12 hours' ? 'selected' : '' %>>12 hours</option>
                     <option <%= p.update_interval === '13 hours' ? 'selected' : '' %>>13 hours</option>
                     <option <%= p.update_interval === '14 hours' ? 'selected' : '' %>>14 hours</option>
                   </select>
                 </td>
-                <td class="px-4 py-2"><%= new Date(p.last_update).toLocaleString() %></td>
+                <td class="px-4 py-2 last-update"><%= new Date(p.last_update).toLocaleString() %></td>
+                <td class="px-4 py-2 text-center">
+                  <button type="button"
+                          class="updateBtn bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
+                    Update
+                  </button>
+                </td>
               </tr>
-            <% }) %>
+              <% }) %>
+            <% } %>
           </tbody>
         </table>
       </div>
+    </form>
 
-      <!-- Pagination -->
-      <% if (typeof totalPages !== 'undefined' && totalPages > 1) { %>
-      <div class="flex justify-center mt-6 gap-2">
-        <% for (let i = 1; i <= totalPages; i++) { %>
-          <% if (i === currentPage) { %>
-            <span class="bg-blue-600 text-white px-3 py-1 rounded"><%= i %></span>
-          <% } else { %>
-            <a href="/products?page=<%= i %><%= search ? '&search=' + encodeURIComponent(search) : '' %>"
-               class="bg-gray-200 text-gray-800 px-3 py-1 rounded hover:bg-gray-300"><%= i %></a>
-          <% } %>
+    <!-- Pagination -->
+    <% if (typeof totalPages !== 'undefined' && totalPages > 1) { %>
+    <div class="flex justify-center mt-6 gap-2">
+      <% for (let i = 1; i <= totalPages; i++) { %>
+        <% if (i === currentPage) { %>
+          <span class="bg-blue-600 text-white px-3 py-1 rounded"><%= i %></span>
+        <% } else { %>
+          <a href="/products?page=<%= i %><%= search ? '&search=' + encodeURIComponent(search) : '' %>"
+             class="bg-gray-200 text-gray-800 px-3 py-1 rounded hover:bg-gray-300"><%= i %></a>
         <% } %>
-      </div>
       <% } %>
     </div>
+    <% } %>
+  </div>
 
-    <!-- Scripts -->
-    <script>
-      // === Top Loading Bar ===
-      function showLoadingBar() {
-        const bar = document.getElementById('loading-bar');
+  <!-- === Scripts === -->
+  <script>
+    // --- Loading Bar ---
+    function showLoadingBar() {
+      const bar = document.getElementById('loading-bar');
+      bar.style.width = '0%';
+      bar.classList.remove('hidden');
+      setTimeout(() => (bar.style.width = '80%'), 50);
+    }
+    function hideLoadingBar() {
+      const bar = document.getElementById('loading-bar');
+      bar.style.width = '100%';
+      setTimeout(() => {
         bar.style.width = '0%';
-        bar.classList.remove('hidden');
-        setTimeout(() => (bar.style.width = '80%'), 50);
-      }
+        bar.classList.add('hidden');
+      }, 500);
+    }
+    window.addEventListener('load', hideLoadingBar);
 
-      function hideLoadingBar() {
-        const bar = document.getElementById('loading-bar');
-        bar.style.width = '100%';
-        setTimeout(() => {
-          bar.style.width = '0%';
-          bar.classList.add('hidden');
-        }, 500);
-      }
+    // --- Select All & Highlight Logic ---
+    const selectAll = document.getElementById('selectAll');
+    const checkboxes = document.querySelectorAll('.selectRow');
+    const batchBtn = document.getElementById('batchUpdateBtn');
 
-      window.addEventListener('load', hideLoadingBar);
-
-      // === Select All Logic ===
-      const selectAll = document.getElementById('selectAll');
-      const checkboxes = document.querySelectorAll('.selectRow');
-      const batchBtn = document.getElementById('batchUpdateBtn');
-
-      selectAll.addEventListener('change', (e) => {
-        checkboxes.forEach(cb => {
-          cb.checked = e.target.checked;
-          toggleRowHighlight(cb);
-        });
-        toggleBatchButton();
-      });
-
-      checkboxes.forEach(cb => cb.addEventListener('change', () => {
+    selectAll.addEventListener('change', (e) => {
+      checkboxes.forEach(cb => {
+        cb.checked = e.target.checked;
         toggleRowHighlight(cb);
-        toggleBatchButton();
-      }));
-
-      // Highlight selected rows
-      function toggleRowHighlight(cb) {
-        const row = cb.closest('tr');
-        if (cb.checked) row.classList.add('bg-blue-50');
-        else row.classList.remove('bg-blue-50');
-      }
-
-      // Enable/Disable Batch Update Button
-      function toggleBatchButton() {
-        const anyChecked = [...checkboxes].some(cb => cb.checked);
-        batchBtn.disabled = !anyChecked;
-      }
-
-      // === Confirmation Before Submit ===
-      document.getElementById('batchForm').addEventListener('submit', (e) => {
-        const selected = document.querySelectorAll('.selectRow:checked');
-        if (selected.length === 0) {
-          alert('Please select at least one product to update.');
-          e.preventDefault();
-          return;
-        }
-        if (!confirm(`Update ${selected.length} selected product(s)?`)) {
-          e.preventDefault();
-        } else {
-          showLoadingBar();
-        }
       });
+      toggleBatchButton();
+    });
 
-      // === Toast Notification ===
-      const params = new URLSearchParams(window.location.search);
-      const status = params.get('status');
+    checkboxes.forEach(cb => cb.addEventListener('change', () => {
+      toggleRowHighlight(cb);
+      toggleBatchButton();
+    }));
+
+    function toggleRowHighlight(cb) {
+      const row = cb.closest('tr');
+      if (cb.checked) row.classList.add('bg-blue-50');
+      else row.classList.remove('bg-blue-50');
+    }
+
+    function toggleBatchButton() {
+      const anyChecked = [...checkboxes].some(cb => cb.checked);
+      batchBtn.disabled = !anyChecked;
+    }
+
+    // --- Batch Form Confirmation ---
+    document.getElementById('batchForm').addEventListener('submit', (e) => {
+      const selected = document.querySelectorAll('.selectRow:checked');
+      if (selected.length === 0) {
+        alert('Please select at least one product to update.');
+        e.preventDefault();
+        return;
+      }
+      if (!confirm(`Update ${selected.length} selected product(s)?`)) {
+        e.preventDefault();
+      } else {
+        showLoadingBar();
+      }
+    });
+
+    // --- Toast Function ---
+    function showToast(message, success) {
       const toast = document.getElementById('toast');
       const toastMsg = document.getElementById('toast-message');
+      toastMsg.textContent = message;
+      toast.classList.remove('hidden');
+      toast.classList.remove(success ? 'bg-red-500' : 'bg-green-500');
+      toast.classList.add(success ? 'bg-green-500' : 'bg-red-500');
+      setTimeout(() => toast.classList.add('hidden'), 3000);
+    }
 
-      if (status === 'success') {
-        toast.classList.remove('hidden', 'bg-red-500');
-        toast.classList.add('bg-green-500');
-        toastMsg.textContent = 'Batch update completed successfully!';
-      } else if (status === 'error') {
-        toast.classList.remove('hidden', 'bg-green-500');
-        toast.classList.add('bg-red-500');
-        toastMsg.textContent = 'Error during batch update.';
-      }
+    // --- Inline Single Row Update (AJAX) ---
+     // --- Inline Single Row Update (AJAX) ---
+ // --- Inline Single Row Update (AJAX) ---
+document.querySelectorAll('.updateBtn').forEach(btn => {
+  btn.addEventListener('click', async (e) => {
+    const row = e.target.closest('tr');
+    const id = row.dataset.productId;
+    const qty = row.querySelector('input[name="qty"]').value;
+    const minimum_price = row.querySelector('input[name="minimum_price"]').value;
+    const update_interval = row.querySelector('select[name="update_interval"]').value;
 
-      if (status) {
-        setTimeout(() => {
-          toast.classList.add('hidden');
-          window.history.replaceState({}, document.title, '/products');
-        }, 3000);
+    showLoadingBar();
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+
+    try {
+      const res = await fetch(`/products/update/${id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({ qty, minimum_price, update_interval })
+      });
+
+      const success = await res.json(); // 🔥 returns true or false directly
+      hideLoadingBar();
+
+      if (success) {
+        showToast('Product updated successfully!', true);
+        row.classList.add('bg-green-50');
+        const now = new Date();
+        const lastUpdateCell = row.querySelector('.last-update');
+        if (lastUpdateCell) lastUpdateCell.textContent = now.toLocaleString();
+        setTimeout(() => row.classList.remove('bg-green-50'), 1200);
+      } else {
+        showToast('Error updating product.', false);
       }
-    </script>
-  </body>
+    } catch (err) {
+      console.error('Update failed:', err);
+      hideLoadingBar();
+      //showToast('Unexpected error during update.', false);
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Update';
+  });
+});
+
+
+    // --- Toast for batch update redirect ---
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get('status');
+    if (status === 'success') showToast('Batch update completed successfully!', true);
+    else if (status === 'error') showToast('Error during batch update.', false);
+  </script>
+</body>
 </html>
