@@ -65,6 +65,7 @@
           <thead class="bg-gray-200 text-gray-700">
             <tr>
               <th class="px-4 py-2 text-left"><input type="checkbox" id="selectAll" class="cursor-pointer"></th>
+              <th class="px-4 py-2 text-left">ID</th> 
               <th class="px-4 py-2 text-left">SKU</th>
               <th class="px-4 py-2 text-left">Product Name</th>
               <th class="px-4 py-2 text-left">Price ($)</th>
@@ -84,6 +85,7 @@
                 <td class="px-4 py-2 text-center">
                   <input type="checkbox" name="selected[]" value="<%= p.id %>" class="selectRow cursor-pointer">
                 </td>
+                <td class="px-4 py-2 text-gray-600 font-medium"><%= p.id %></td> 
                 <td class="px-4 py-2"><%= p.sku %></td>
                 <td class="px-4 py-2"><%= p.product_name %></td>
                 <td class="px-4 py-2"><%= parseFloat(p.price).toFixed(2) %></td>
@@ -97,11 +99,13 @@
                          class="border p-1 rounded w-24 text-center" />
                 </td>
                 <td class="px-4 py-2">
-                  <select name="update_interval[]" class="border p-1 rounded">
-                    <option <%= p.update_interval === '12 hours' ? 'selected' : '' %>>12 </option>
-                    <option <%= p.update_interval === '13 hours' ? 'selected' : '' %>>13 </option>
-                    <option <%= p.update_interval === '14 hours' ? 'selected' : '' %>>14 </option>
-                  </select>
+                  <select name="update_interval[]" class="border p-1 rounded w-20 text-center">
+  <option value="12" <%= parseInt(p.update_interval) === 12 ? 'selected' : '' %>>12</option>
+  <option value="13" <%= parseInt(p.update_interval) === 13 ? 'selected' : '' %>>13</option>
+  <option value="14" <%= parseInt(p.update_interval) === 14 ? 'selected' : '' %>>14</option>
+  <option value="24" <%= parseInt(p.update_interval) === 24 ? 'selected' : '' %>>24</option>
+</select>
+
                 </td>
                 <td class="px-4 py-2 last-update"><%= new Date(p.last_update).toLocaleString() %></td>
                 <td class="px-4 py-2 text-center">
@@ -116,6 +120,22 @@
           </tbody>
         </table>
       </div>
+      <!-- === Pagination === -->
+<% if (typeof totalPages !== 'undefined' && totalPages > 1) { %>
+  <div class="flex justify-center mt-6 gap-2">
+    <% for (let i = 1; i <= totalPages; i++) { %>
+      <% if (i === currentPage) { %>
+        <span class="bg-blue-600 text-white px-3 py-1 rounded"><%= i %></span>
+      <% } else { %>
+        <a href="/products?page=<%= i %><%= search ? '&search=' + encodeURIComponent(search) : '' %>"
+           class="bg-gray-200 text-gray-800 px-3 py-1 rounded hover:bg-gray-300">
+           <%= i %>
+        </a>
+      <% } %>
+    <% } %>
+  </div>
+<% } %>
+
     </form>
   </div>
 
