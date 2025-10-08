@@ -1,11 +1,16 @@
-const db = require('../config/db');
+ const db = require('../config/db');
 
-// ✅ Fetch all products (with pagination + search)
+// ✅ Fetch all products (with pagination + search + sorting)
 exports.getProducts = (req, res) => {
   const search = req.query.search || '';
+  const sort = req.query.sort || 'sku'; // default sort column
+  const order = req.query.order === 'desc' ? 'DESC' : 'ASC'; // toggle asc/desc
   const page = parseInt(req.query.page) || 1;
   const limit = 10;
   const offset = (page - 1) * limit;
+
+  const validSortColumns = ['sku', 'qty']; // allow only these for safety
+  const sortColumn = validSortColumns.includes(sort) ? sort : 'sku';
 
   const searchCondition = search
     ? `WHERE product_name LIKE ? OR sku LIKE ?`
@@ -17,7 +22,7 @@ exports.getProducts = (req, res) => {
   const dataQuery = `
     SELECT * FROM products
     ${searchCondition}
-    ORDER BY id ASC
+    ORDER BY ${sortColumn} ${order}
     LIMIT ? OFFSET ?
   `;
 
@@ -30,6 +35,8 @@ exports.getProducts = (req, res) => {
         search,
         totalPages: 0,
         currentPage: 1,
+        sort,
+        order,
       });
     }
 
@@ -48,6 +55,8 @@ exports.getProducts = (req, res) => {
             search,
             totalPages: 0,
             currentPage: 1,
+            sort,
+            order,
           });
         }
 
@@ -57,11 +66,14 @@ exports.getProducts = (req, res) => {
           search,
           totalPages,
           currentPage: page,
+          sort,
+          order,
         });
       }
     );
   });
 };
+
 
 // ✅ Single-row AJAX update (true/false return)
 exports.updateProduct = (req, res) => {
@@ -79,7 +91,7 @@ exports.updateProduct = (req, res) => {
 
   const sql = `
     UPDATE products
-    SET qty = ?, minimum_price = ?, update_interval = ?, updated_at = NOW()
+    SET qty = ?, minimum_price = ?, update_interval = ?, last_update = NOW()
     WHERE id = ?
   `;
 
@@ -120,7 +132,7 @@ exports.batchUpdate = (req, res) => {
 
   const sql = `
     UPDATE products
-    SET qty = ?, minimum_price = ?, update_interval = ?, updated_at = NOW()
+    SET qty = ?, minimum_price = ?, update_interval = ?, last_update = NOW()
     WHERE id = ?
   `;
 
