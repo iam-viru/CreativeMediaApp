@@ -1,16 +1,11 @@
- const db = require('../config/db');
+const db = require('../config/db');
 
-// ✅ Fetch all products (with pagination + search + sorting)
+// ✅ Fetch all products (with pagination + search + fixed sorting)
 exports.getProducts = (req, res) => {
   const search = req.query.search || '';
-  const sort = req.query.sort || 'sku'; // default sort column
-  const order = req.query.order === 'desc' ? 'DESC' : 'ASC'; // toggle asc/desc
   const page = parseInt(req.query.page) || 1;
   const limit = 10;
   const offset = (page - 1) * limit;
-
-  const validSortColumns = ['sku', 'qty']; // allow only these for safety
-  const sortColumn = validSortColumns.includes(sort) ? sort : 'sku';
 
   const searchCondition = search
     ? `WHERE product_name LIKE ? OR sku LIKE ?`
@@ -22,7 +17,7 @@ exports.getProducts = (req, res) => {
   const dataQuery = `
     SELECT * FROM products
     ${searchCondition}
-    ORDER BY ${sortColumn} ${order}
+    ORDER BY sku ASC, qty ASC
     LIMIT ? OFFSET ?
   `;
 
@@ -34,9 +29,7 @@ exports.getProducts = (req, res) => {
         products: [],
         search,
         totalPages: 0,
-        currentPage: 1,
-        sort,
-        order,
+        currentPage: 1
       });
     }
 
@@ -54,9 +47,7 @@ exports.getProducts = (req, res) => {
             products: [],
             search,
             totalPages: 0,
-            currentPage: 1,
-            sort,
-            order,
+            currentPage: 1
           });
         }
 
@@ -65,9 +56,7 @@ exports.getProducts = (req, res) => {
           products: results,
           search,
           totalPages,
-          currentPage: page,
-          sort,
-          order,
+          currentPage: page
         });
       }
     );
@@ -102,7 +91,7 @@ exports.updateProduct = (req, res) => {
       return res.redirect('/products?status=error');
     }
 
-    if (isAjax) return res.json(true); // ✅ true = success
+    if (isAjax) return res.json(true);
     res.redirect('/products?status=success');
   });
 };
@@ -117,7 +106,6 @@ exports.batchUpdate = (req, res) => {
     return res.redirect('/products?status=error');
   }
 
-  // Build updates array
   const updates = [];
   for (let i = 0; i < id.length; i++) {
     if (selected.includes(id[i])) {

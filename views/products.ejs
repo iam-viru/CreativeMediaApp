@@ -66,37 +66,16 @@
             <tr>
               <th class="px-4 py-2 text-left"><input type="checkbox" id="selectAll" class="cursor-pointer"></th>
               <th class="px-4 py-2 text-left">ID</th> 
-
-              <!-- 🔹 Sortable SKU column -->
-              <th class="px-4 py-2 text-left">
-                <a href="?sort=sku&order=<%= sort === 'sku' && order === 'ASC' ? 'desc' : 'asc' %>&search=<%= search %>">
-                  SKU
-                  <% if (sort === 'sku') { %>
-                    <%= order === 'ASC' ? '⬆️' : '⬇️' %>
-                  <% } %>
-                </a>
-              </th>
-
+              <th class="px-4 py-2 text-left">SKU</th>
               <th class="px-4 py-2 text-left">Product Name</th>
               <th class="px-4 py-2 text-left">Price ($)</th>
-
-              <!-- 🔹 Sortable Qty column -->
-              <th class="px-4 py-2 text-left">
-                <a href="?sort=qty&order=<%= sort === 'qty' && order === 'ASC' ? 'desc' : 'asc' %>&search=<%= search %>">
-                  Qty
-                  <% if (sort === 'qty') { %>
-                    <%= order === 'ASC' ? '⬆️' : '⬇️' %>
-                  <% } %>
-                </a>
-              </th>
-
+              <th class="px-4 py-2 text-left">Qty</th>
               <th class="px-4 py-2 text-left">Min Price ($)</th>
               <th class="px-4 py-2 text-left">Update Interval (hours)</th>
               <th class="px-4 py-2 text-left">Last Update</th>
               <th class="px-4 py-2 text-center">Action</th>
             </tr>
           </thead>
-
           <tbody>
             <% if (products.length === 0) { %>
               <tr><td colspan="9" class="text-center py-6 text-gray-500">No products found</td></tr>
@@ -148,7 +127,7 @@
             <% if (i === currentPage) { %>
               <span class="bg-blue-600 text-white px-3 py-1 rounded"><%= i %></span>
             <% } else { %>
-              <a href="/products?page=<%= i %><%= search ? '&search=' + encodeURIComponent(search) : '' %>&sort=<%= sort %>&order=<%= order %>"
+              <a href="/products?page=<%= i %><%= search ? '&search=' + encodeURIComponent(search) : '' %>"
                  class="bg-gray-200 text-gray-800 px-3 py-1 rounded hover:bg-gray-300">
                  <%= i %>
               </a>
@@ -162,7 +141,124 @@
 
   <!-- ✅ Script section -->
   <script>
-    /* (All your existing JS remains unchanged) */
+    function showLoadingBar() {
+      const bar = document.getElementById('loading-bar');
+      bar.style.width = '0%';
+      bar.classList.remove('hidden');
+      setTimeout(() => (bar.style.width = '80%'), 50);
+    }
+
+    function hideLoadingBar() {
+      const bar = document.getElementById('loading-bar');
+      bar.style.width = '100%';
+      setTimeout(() => { bar.style.width = '0%'; bar.classList.add('hidden'); }, 500);
+    }
+
+    function showToast(message, success) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-message');
+      toastMsg.textContent = message;
+      toast.classList.remove('hidden');
+      toast.classList.remove(success ? 'bg-red-500' : 'bg-green-500');
+      toast.classList.add(success ? 'bg-green-500' : 'bg-red-500');
+      setTimeout(() => toast.classList.add('hidden'), 3000);
+    }
+
+    // === Checkbox selection ===
+    const selectAll = document.getElementById('selectAll');
+    const checkboxes = document.querySelectorAll('.selectRow');
+    const batchBtn = document.getElementById('batchUpdateBtn');
+    selectAll.addEventListener('change', (e) => {
+      checkboxes.forEach(cb => {
+        cb.checked = e.target.checked;
+        toggleRowHighlight(cb);
+      });
+      toggleBatchButton();
+    });
+    checkboxes.forEach(cb => cb.addEventListener('change', () => {
+      toggleRowHighlight(cb);
+      toggleBatchButton();
+    }));
+    function toggleRowHighlight(cb) {
+      const row = cb.closest('tr');
+      if (cb.checked) row.classList.add('bg-blue-50');
+      else row.classList.remove('bg-blue-50');
+    }
+    function toggleBatchButton() {
+      const anyChecked = [...checkboxes].some(cb => cb.checked);
+      batchBtn.disabled = !anyChecked;
+    }
+
+    // === Inline Single Row AJAX Update ===
+    document.querySelectorAll('.updateBtn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const row = e.target.closest('tr');
+        const id = row.dataset.productId;
+        const qty = row.querySelector('input[name="qty[]"]').value;
+        const minimum_price = row.querySelector('input[name="minimum_price[]"]').value;
+        const update_interval = row.querySelector('select[name="update_interval[]"]').value;
+
+        showLoadingBar();
+        btn.disabled = true;
+        btn.textContent = 'Saving...';
+
+        try {
+          const res = await fetch(`/products/update/${id}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ qty, minimum_price, update_interval })
+          });
+
+          const result = await res.json();
+          hideLoadingBar();
+
+          if (result === true) {
+            showToast('✅ Product updated successfully!', true);
+            row.classList.add('bg-green-50');
+            const now = new Date();
+            const lastUpdateCell = row.querySelector('.last-update');
+            if (lastUpdateCell) lastUpdateCell.textContent = now.toLocaleString();
+            setTimeout(() => row.classList.remove('bg-green-50'), 1200);
+          } else {
+            showToast('❌ Error updating product.', false);
+          }
+        } catch (err) {
+          console.error('Update failed:', err);
+          hideLoadingBar();
+          showToast('⚠️ Unexpected error during update.', false);
+        }
+
+        btn.disabled = false;
+        btn.textContent = 'Update';
+      });
+    });
+
+    // === Toast Notification for batch updates ===
+    document.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      const status = params.get('status');
+
+      if (status) {
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toast-message');
+
+        toast.classList.remove('hidden');
+        if (status === 'success') {
+          toast.classList.add('bg-green-500');
+          toastMsg.textContent = '✅ Batch update completed successfully!';
+        } else {
+          toast.classList.add('bg-red-500');
+          toastMsg.textContent = '❌ Error during batch update.';
+        }
+
+        // Keep toast visible for 3s, then hide and clean URL
+        setTimeout(() => {
+          toast.classList.add('hidden');
+          window.history.replaceState({}, document.title, '/products');
+        }, 3000);
+      }
+    });
   </script>
 </body>
 </html>
