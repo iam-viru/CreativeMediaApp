@@ -1,6 +1,5 @@
 const db = require('../config/db');
-
-// ✅ Fetch all products (with pagination + search + fixed sorting)
+// Fetch all products (with pagination + search + fixed sorting)
 exports.getProducts = (req, res) => {
   const search = req.query.search || '';
   const page = parseInt(req.query.page) || 1;
@@ -62,10 +61,9 @@ exports.getProducts = (req, res) => {
     );
   });
 };
-
-
-// ✅ Single-row AJAX update (true/false return)
+// Single-row AJAX update (true/false return)
 exports.updateProduct = (req, res) => {
+  debugger;
   const { id } = req.params;
   const { qty, minimum_price, update_interval } = req.body;
 
@@ -95,9 +93,7 @@ exports.updateProduct = (req, res) => {
     res.redirect('/products?status=success');
   });
 };
-
-
-// ✅ Batch update (multi-row form submission)
+// Batch update (multi-row form submission)
 exports.batchUpdate = (req, res) => {
   const { id, qty, minimum_price, update_interval, selected } = req.body;
 
@@ -142,3 +138,110 @@ exports.batchUpdate = (req, res) => {
     });
   });
 };
+// ===================== ADD NEW PRODUCT =====================
+exports.addProduct = (req, res) => {
+  const { sku, mpid, product_name, product_url, active, priceBreaks } = req.body;
+
+  // Validate inputs
+  if (!sku || !priceBreaks || !Array.isArray(priceBreaks) || priceBreaks.length === 0) {
+    console.error('Invalid payload for addProduct');
+    return res.status(400).json({ success: false, message: 'Invalid payload' });
+  }
+
+  // ✅ Use the first price break as the base record
+  const pb = priceBreaks[0];
+
+  const sql = `
+    INSERT INTO products 
+      (sku, mpid, product_name, product_url, price, qty, minimum_price, update_interval, active, last_update)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+  `;
+
+  const values = [
+    sku,
+    mpid || null,
+    product_name || null,
+    product_url || null,
+    parseFloat(pb.min),      // price = minimum_price
+    parseInt(pb.qty),
+    parseFloat(pb.min),
+    pb.interval,
+    active ? 1 : 0
+  ];
+
+  db.query(sql, values, (err, result) => {
+    if (err) {
+      console.error('Add product error:', err);
+      return res.status(500).json({ success: false, message: err.message });
+    }
+    console.log(`✅ Product '${sku}' inserted successfully.`);
+    return res.json({ success: true });
+  });
+};
+
+
+
+// ===================== DELETE PRODUCT =====================
+exports.deleteProduct = (req, res) => {
+  const { id } = req.params;
+  if (!id) return res.redirect('/products?status=error');
+
+  const sql = 'DELETE FROM products WHERE id = ?';
+  db.query(sql, [id], (err) => {
+    if (err) {
+      console.error('Delete error:', err);
+      return res.redirect('/products?status=error');
+    }
+    return res.redirect('/products?status=success');
+  });
+};
+
+// ===================== FETCH PRODUCT DATA FROM EXTERNAL API =====================
+ exports.fetchProduct = async (req, res) => {
+  const axios = require("axios");
+  const { vpCode } = req.body;
+
+  console.log("🟢 Incoming vpCode:", vpCode);
+
+  if (!vpCode)
+    return res.status(400).json({ success: false, message: "vpCode is required" });
+
+  try {
+    const url = `https://upwork99999.fwh.is/${vpCode}.json`;
+    console.log("🌐 Fetching URL:", url);
+
+    const response = await axios.get(url, {
+      headers: { "Cache-Control": "no-cache" }
+    });
+
+    console.log("📦 Raw API Response:", response.data);
+
+    const data = response.data;
+    const result = data?.payload?.result?.[0];
+    if (!result) {
+      console.warn("⚠️ No result found");
+      return res.status(404).json({ success: false, message: "No data found" });
+    }
+
+    const { mpid, description } = result;
+    console.log("✅ Extracted:", { mpid, description });
+
+    return res.json({ success: true, mpid, description });
+  } catch (err) {
+    console.error("❌ fetchProduct error:", err.message);
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+
+ 
+
+
+
+
+
+
+// ===================== FETCH PRODUCT DATA FROM EXTERNAL API =====================
+
+
+

@@ -90,6 +90,8 @@ app.use((err, req, res, next) => {
 // Start Server
 // ====================
 const PORT = process.env.PORT || 3000;
+const listEndpoints = require('express-list-endpoints');
+console.log(listEndpoints(app));
 app.listen(PORT, () =>
   console.log(`🚀 Server running on http://localhost:${PORT}`)
 );
