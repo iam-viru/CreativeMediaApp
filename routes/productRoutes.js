@@ -13,4 +13,7 @@ router.post("/add", productController.addProduct);
 router.post("/delete/:id", productController.deleteProduct);
 // Fetch product info (Proxy API)
 router.post('/fetchProduct', productController.fetchProduct);
+
+router.post('/updateActive/:id', productController.updateActive);
+
 module.exports = router;

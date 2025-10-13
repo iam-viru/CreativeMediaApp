@@ -197,51 +197,61 @@ exports.deleteProduct = (req, res) => {
 };
 
 // ===================== FETCH PRODUCT DATA FROM EXTERNAL API =====================
- exports.fetchProduct = async (req, res) => {
+  exports.fetchProduct = async (req, res) => {
   const axios = require("axios");
   const { vpCode } = req.body;
-
-  console.log("🟢 Incoming vpCode:", vpCode);
 
   if (!vpCode)
     return res.status(400).json({ success: false, message: "vpCode is required" });
 
   try {
-    const url = `https://upwork99999.fwh.is/${vpCode}.json`;
-    console.log("🌐 Fetching URL:", url);
+     
+    const url = `https://raw.githubusercontent.com/freelancerking/net32/refs/heads/main/${vpCode}.json`;
+    const response = await axios.get(url, { responseType: "json" });
 
-    const response = await axios.get(url, {
-      headers: { "Cache-Control": "no-cache" }
-    });
-
-    console.log("📦 Raw API Response:", response.data);
-
-    const data = response.data;
-    const result = data?.payload?.result?.[0];
+    const result = response.data?.payload?.result?.[0];
     if (!result) {
-      console.warn("⚠️ No result found");
-      return res.status(404).json({ success: false, message: "No data found" });
+      return res.status(404).json({ success: false, message: "No data found in API response" });
     }
 
-    const { mpid, description } = result;
-    console.log("✅ Extracted:", { mpid, description });
+    const mpid = result.mpid ?? null;
+    const description = result.description ?? "";
 
+    console.log("✅ Extracted from API:", { mpid, description });
     return res.json({ success: true, mpid, description });
   } catch (err) {
     console.error("❌ fetchProduct error:", err.message);
     return res.status(500).json({ success: false, message: err.message });
   }
 };
-
-
  
-
-
-
-
-
-
 // ===================== FETCH PRODUCT DATA FROM EXTERNAL API =====================
+
+
+exports.updateActive = (req, res) => {
+  const { id } = req.params;
+  const { active } = req.body;
+  const isAjax = req.headers['content-type']?.includes('application/json');
+
+  if (!id) {
+    if (isAjax) return res.json(false);
+    return res.redirect('/products?status=error');
+  }
+
+  const sql = `UPDATE products SET active = ?, last_update = NOW() WHERE id = ?`;
+
+  db.query(sql, [active, id], (err) => {
+    if (err) {
+      console.error('Active update error:', err);
+      if (isAjax) return res.json(false);
+      return res.redirect('/products?status=error');
+    }
+
+    if (isAjax) return res.json(true);
+    res.redirect('/products?status=success');
+  });
+};
+
 
 
 

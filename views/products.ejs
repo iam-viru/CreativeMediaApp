@@ -178,7 +178,13 @@
                     <option value="24" <%= parseInt(p.update_interval) === 24 ? 'selected' : '' %>>24</option>
                   </select>
                 </td>
-                <td class="px-4 py-2"><%= p.active ? '✅' : '❌' %></td>
+                <td class="px-4 py-2 text-center">
+  <input type="checkbox"
+         class="toggle-active w-5 h-5 cursor-pointer"
+         data-id="<%= p.id %>"
+         <%= p.active ? 'checked' : '' %> />
+</td>
+
                 <td class="px-4 py-2 last-update"><%= new Date(p.last_update).toLocaleString() %></td>
                 <td class="px-4 py-2 text-center">
                   <button type="button"
@@ -339,31 +345,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const mpidInput = document.getElementById('mpid');
   const productNameInput = document.getElementById('product_name');
 
-  /*if (vpCodeInput) {
+  if (vpCodeInput) {
     vpCodeInput.addEventListener('blur', async () => {
       const vpCode = vpCodeInput.value.trim();
       if (!vpCode) return;
 
       spinner.classList.remove('hidden'); // show spinner
-      try {
-       /* const res = await fetch('https://upwork99999.fwh.is/' + vpCode + '.json', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Cache-Control': 'no-cache',
-            'Subscription-Key': 'YOUR_SUBSCRIPTION_KEY_HERE'
-          },
-          body: JSON.stringify({
-            vpCode: vpCode,
-            mpid: '',
-            status: 'all',
-            limit: 1,
-            after_vpCode: ''
-          })
-        });
 
-         //Use  static endpoint for testing
-       const res = await fetch('/products/fetchProduct', {
+      try {
+        // ✅ Call your backend route (no CORS issue)
+        const res = await fetch('/products/fetchProduct', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ vpCode })
@@ -372,24 +363,22 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!res.ok) throw new Error('API request failed');
         const data = await res.json();
 
-        const item = data?.payload?.result?.[0];
-        if (item) {
-          mpidInput.value = item.mpid || '';
-          productNameInput.value = item.description || '';
+        if (data.success) {
+          mpidInput.value = data.mpid || '';
+          productNameInput.value = data.description || '';
         } else {
           mpidInput.value = '';
           productNameInput.value = '';
           alert('No product data found for that VP Code.');
         }
-
       } catch (err) {
         console.error('API fetch error:', err);
         alert('Failed to fetch product info. Please try again.');
       } finally {
-        spinner.classList.add('hidden'); // hide spinner after request completes
+        spinner.classList.add('hidden'); // hide spinner
       }
     });
-  }*/
+  } 
 
 
 // === Add Product ===
@@ -431,6 +420,34 @@ document.addEventListener('DOMContentLoaded', () => {
         showToast('⚠️ Unexpected error while adding product.', false);
       }
     });
+
+
+    // === Toggle Active Column ===
+document.querySelectorAll('.toggle-active').forEach(toggle => {
+  toggle.addEventListener('change', async (e) => {
+    const id = e.target.dataset.id;
+    const isActive = e.target.checked ? 1 : 0;
+
+    try {
+      const res = await fetch(`/products/updateActive/${id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ active: isActive })
+      });
+
+      const result = await res.json();
+      if (result === true) {
+        showToast(`Active status updated to ${isActive ? '✅ Active' : '❌ Inactive'}`, true);
+      } else {
+        showToast('Error updating active status', false);
+      }
+    } catch (err) {
+      console.error('Toggle active failed:', err);
+      showToast('⚠️ Unexpected error updating active status', false);
+    }
+  });
+});
+
 
 });
 
