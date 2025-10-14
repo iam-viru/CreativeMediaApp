@@ -206,7 +206,7 @@ exports.deleteProduct = (req, res) => {
 
   try {
      //change your url accordingly
-    const url = `https://raw.githubusercontent.com/freelancerking/net32/refs/heads/main/${vpCode}.json`;
+    const apiUrl = `https://raw.githubusercontent.com/freelancerking/net32/refs/heads/main/${vpCode}.json`;
       // ✅ POST body (payload)
     const payload = {
       vpCode: vpCode,
