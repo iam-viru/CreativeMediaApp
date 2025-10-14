@@ -205,9 +205,24 @@ exports.deleteProduct = (req, res) => {
     return res.status(400).json({ success: false, message: "vpCode is required" });
 
   try {
-     
+     //change your url accordingly
     const url = `https://raw.githubusercontent.com/freelancerking/net32/refs/heads/main/${vpCode}.json`;
-    const response = await axios.get(url, { responseType: "json" });
+      // ✅ POST body (payload)
+    const payload = {
+      vpCode: vpCode,
+      mpid: "",
+      status: "all",
+      limit: 1,
+      after_vpCode: ""
+    };
+
+     // ✅ Required headers (client instruction)
+    const headers = {
+      'Cache-Control': 'no-cache',
+      'Subscription-Key': process.env.SUBSCRIPTION_KEY || 'YOUR_SUBSCRIPTION_KEY_HERE',
+      'Content-Type': 'application/json'
+    };
+    const response = await axios.post(apiUrl, payload, { headers });
 
     const result = response.data?.payload?.result?.[0];
     if (!result) {
