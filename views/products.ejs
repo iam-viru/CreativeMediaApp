@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Products</title>
   <link rel="stylesheet" href="/css/output.css" />
 </head>
+
 <body class="bg-gray-100 min-h-screen font-sans relative">
 
   <!-- Loading Bar -->
@@ -17,8 +19,7 @@
   </div>
 
   <!-- Toast Notification -->
-  <div id="toast"
-       class="hidden fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg z-50">
+  <div id="toast" class="hidden fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg z-50">
     <span id="toast-message"></span>
   </div>
 
@@ -31,19 +32,19 @@
         <a href="/users" class="text-gray-700 hover:text-blue-600 font-medium">Users</a>
       </div>
       <div class="flex items-center gap-3">
-        <img src="<%= user.profile_image || '/images/default-avatar.png' %>"
-             alt="User Avatar"
-             class="w-9 h-9 rounded-full border border-gray-300 object-cover" />
-        <span class="text-gray-700 font-medium"><%= user.name || user.username %></span>
-        <a href="/logout"
-           class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition">
+        <img src="<%= user.profile_image || '/images/default-avatar.png' %>" alt="User Avatar"
+          class="w-9 h-9 rounded-full border border-gray-300 object-cover" />
+        <span class="text-gray-700 font-medium">
+          <%= user.name || user.username %>
+        </span>
+        <a href="/logout" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition">
           Logout
         </a>
       </div>
     </div>
   </nav>
 
-  <!-- ✅ Add New Product Form -->
+  <!-- ✅ Add New Product Form Starts -->
   <div class="max-w-7xl mx-auto bg-white shadow p-4 rounded mt-6 space-y-4">
     <h2 class="text-lg font-semibold text-gray-700">Add New Product</h2>
     <form id="newProductForm" class="space-y-3">
@@ -51,19 +52,23 @@
         <div>
           <label class="text-sm font-medium">VP Code (SKU)</label>
           <input id="vpCode" name="sku" type="text" placeholder="Enter and press Tab"
-                 class="border rounded p-2 w-full" />
+            class="border rounded p-2 w-full" />
         </div>
         <div>
           <label class="text-sm font-medium">MPID</label>
-          <input id="mpid" name="mpid" type="number" class="border rounded p-2 w-full" />
+          <input id="mpid" name="mpid" type="number" required class="border rounded p-2 w-full" />
         </div>
         <div>
           <label class="text-sm font-medium">Product Name</label>
-          <input id="product_name" name="product_name" type="text" class="border rounded p-2 w-full" />
+          <input id="product_name" name="product_name" type="text" required class="border rounded p-2 w-full" />
         </div>
         <div>
           <label class="text-sm font-medium">Product URL</label>
-          <input id="product_url" name="product_url" type="text" class="border rounded p-2 w-full" />
+          <input id="product_url" name="product_url" type="text" required class="border rounded p-2 w-full" />
+        </div>
+        <div>
+          <label class="text-sm font-medium">Inventory</label>
+          <input id="inventory" name="inventory" type="number" required class="border rounded p-2 w-full" />
         </div>
         <div class="flex items-center mt-6 gap-2">
           <input id="active" name="active" type="checkbox" checked class="w-4 h-4" />
@@ -71,32 +76,31 @@
         </div>
       </div>
 
-      <!-- ✅ Price Break Table -->
       <h3 class="text-sm font-semibold text-gray-700 mt-4">Price Breaks (Up to 5)</h3>
       <table id="priceBreaksTable" class="min-w-full bg-gray-50 border rounded">
         <thead class="bg-gray-200 text-gray-700 text-sm">
           <tr>
             <th class="px-3 py-2 text-left">Qty</th>
-            <th class="px-3 py-2 text-left"> Minimum Price</th>
-            <th class="px-3 py-2 text-left">Update Interval</th>
+            <th class="px-3 py-2 text-left">Min Price</th>
+            <th class="px-3 py-2 text-left">Interval (hours)</th>
           </tr>
         </thead>
         <tbody>
           <% for(let i=0;i<5;i++){ %>
-          <tr>
-            <td class="px-3 py-2"><input name="qty[]" type="number" class="border p-1 rounded w-20"></td>
-            <td class="px-3 py-2"><input name="minimum_price[]" type="number" step="0.01" class="border p-1 rounded w-24"></td>
-            <td class="px-3 py-2">
-              <select name="update_interval[]" class="border p-1 rounded w-28">
-                <option value="">--</option>
-                <option value="12">12</option>
-                <option value="13">13</option>
-                <option value="14">14</option>
-                <option value="24">24</option>
-              </select>
-            </td>
-          </tr>
-          <% } %>
+            <tr>
+              <td class="px-3 py-2"><input name="qty[]" type="number" class="border p-1 rounded w-20"></td>
+              <td class="px-3 py-2"><input name="minimum_price[]" type="number" step="0.01" value="0"
+                  class="border p-1 rounded w-24"></td>
+              <td class="px-3 py-2">
+                <select name="update_interval[]" class="border p-1 rounded w-28">
+                  <option value="12" selected>12</option>
+                  <option value="13">13</option>
+                  <option value="14">14</option>
+                  <option value="24">24</option>
+                </select>
+              </td>
+            </tr>
+            <% } %>
         </tbody>
       </table>
 
@@ -105,17 +109,18 @@
       </button>
     </form>
   </div>
+  <!-- ✅ Add New Product Form Ends -->
 
-  <!-- Main Product Table -->
+  <!-- Main Product Table Starts-->
   <div class="p-6 space-y-4">
     <form action="/products" method="GET" class="flex justify-between mb-4">
       <div class="flex gap-2 items-center">
-        <input type="text" name="search" placeholder="Search by SKU or Product Name"
-               value="<%= search || '' %>" class="border rounded p-2 w-80">
+        <input type="text" name="search" placeholder="Search by SKU or Product Name" value="<%= search || '' %>"
+          class="border rounded p-2 w-80">
         <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Search</button>
         <% if (search) { %>
           <a href="/products" class="text-gray-600 underline">Clear</a>
-        <% } %>
+          <% } %>
       </div>
     </form>
 
@@ -124,8 +129,8 @@
       <div class="flex justify-between items-center mb-3">
         <h2 class="text-lg font-semibold text-gray-700">Product List</h2>
         <button type="submit" id="batchUpdateBtn"
-                class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50"
-                disabled>Batch Update</button>
+          class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50" disabled>Batch
+          Update</button>
       </div>
 
       <div class="overflow-x-auto">
@@ -142,318 +147,419 @@
               <th class="px-4 py-2 text-left">Qty</th>
               <th class="px-4 py-2 text-left">Min Price ($)</th>
               <th class="px-4 py-2 text-left">Update Interval (hours)</th>
+              <th class="px-4 py-2 text-left">Inventory</th>
+
               <th class="px-4 py-2 text-left">Active</th>
               <th class="px-4 py-2 text-left">Last Update</th>
               <th class="px-4 py-2 text-center">Actions</th>
             </tr>
           </thead>
           <tbody>
-            <% if (products.length === 0) { %>
-              <tr><td colspan="12" class="text-center py-6 text-gray-500">No products found</td></tr>
-            <% } else { %>
-              <% products.forEach(p => { %>
-              <tr class="border-b hover:bg-gray-50" data-product-id="<%= p.id %>">
-                <td class="px-4 py-2 text-center">
-                  <input type="checkbox" name="selected[]" value="<%= p.id %>" class="selectRow cursor-pointer">
-                </td>
-                <td class="px-4 py-2"><%= p.sku %></td>
-                <td class="px-4 py-2"><%= p.mpid %></td>
-                <td class="px-4 py-2"><%= p.product_name %></td>
-                <td class="px-4 py-2 text-blue-600 underline"><a href="<%= p.product_url %>" target="_blank"><%= p.product_url %></a></td>
-                <td class="px-4 py-2"><%= parseFloat(p.price).toFixed(2) %></td>
-                <td class="px-4 py-2">
-                  <input type="hidden" name="id[]" value="<%= p.id %>">
-                  <input type="number" name="qty[]" value="<%= p.qty %>"
-                         class="border p-1 rounded w-20 text-center" />
-                </td>
-                <td class="px-4 py-2">
-                  <input type="number" step="0.01" name="minimum_price[]" value="<%= p.minimum_price %>"
-                         class="border p-1 rounded w-24 text-center" />
-                </td>
-                <td class="px-4 py-2">
-                  <select name="update_interval[]" class="border p-1 rounded w-20 text-center">
-                    <option value="12" <%= parseInt(p.update_interval) === 12 ? 'selected' : '' %>>12</option>
-                    <option value="13" <%= parseInt(p.update_interval) === 13 ? 'selected' : '' %>>13</option>
-                    <option value="14" <%= parseInt(p.update_interval) === 14 ? 'selected' : '' %>>14</option>
-                    <option value="24" <%= parseInt(p.update_interval) === 24 ? 'selected' : '' %>>24</option>
-                  </select>
-                </td>
-                <td class="px-4 py-2 text-center">
-  <input type="checkbox"
-         class="toggle-active w-5 h-5 cursor-pointer"
-         data-id="<%= p.id %>"
-         <%= p.active ? 'checked' : '' %> />
+            
+            <% if (products.length===0) { %>
+              <tr>
+                <td colspan="12" class="text-center py-6 text-gray-500">No products found</td>
+              </tr>
+              <% } else { %>
+                <% products.forEach(p=> { %>
+                  <tr class="border-b hover:bg-gray-50" data-product-id="<%= p.id %>">
+                    <td class="px-4 py-2 text-center">
+                      <input type="checkbox" name="selected[]" value="<%= p.id %>" class="selectRow cursor-pointer">
+                    </td>
+                    <td class="px-4 py-2">
+                      <%= p.sku %>
+                    </td>
+                    <td class="px-4 py-2">
+                      <%= p.mpid %>
+                    </td>
+                    <td class="px-4 py-2">
+                      <%= p.product_name %>
+                    </td>
+                    <td class="px-4 py-2 text-blue-600 underline"><a href="<%= p.product_url %>" target="_blank">
+                        <%= p.product_url %>
+                      </a></td>
+                    <td class="px-4 py-2">
+                      <%= parseFloat(p.price).toFixed(2) %>
+                    </td>
+                    <td class="px-4 py-2">
+                      <input type="hidden" name="id[]" value="<%= p.id %>">
+                      <input type="number" name="qty[]" value="<%= p.qty %>"
+                        class="border p-1 rounded w-20 text-center" />
+                    </td>
+                    <td class="px-4 py-2">
+                      <input type="number" step="0.01" name="minimum_price[]" value="<%= p.minimum_price %>"
+                        class="border p-1 rounded w-24 text-center" />
+                    </td>
+                    <td class="px-4 py-2">
+                      <select name="update_interval[]" class="border p-1 rounded w-20 text-center">
+                        <option value="12" <%=parseInt(p.update_interval)===12 ? 'selected' : '' %>>12</option>
+                        <option value="13" <%=parseInt(p.update_interval)===13 ? 'selected' : '' %>>13</option>
+                        <option value="14" <%=parseInt(p.update_interval)===14 ? 'selected' : '' %>>14</option>
+                        <option value="24" <%=parseInt(p.update_interval)===24 ? 'selected' : '' %>>24</option>
+                      </select>
+                    </td>
+                  
+                    <td class="px-4 py-2 ">
+  <input type="number" name="inventory[]" value="<%= p.inventory || 0 %>" 
+         class="border p-1 rounded w-20 text-center" />
+   <button type="button" class="updateBtn bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700" data-id="<%= p.id %>"
+          data-sku="<%= p.sku %>"
+          data-mpid="<%= p.mpid %>">Update </button>
 </td>
 
-                <td class="px-4 py-2 last-update"><%= new Date(p.last_update).toLocaleString() %></td>
-                <td class="px-4 py-2 text-center">
-                  <button type="button"
-                          class="updateBtn bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">Update</button>
-                  <form action="/products/delete/<%= p.id %>" method="POST" class="inline">
-                    <button type="submit" onclick="return confirm('Delete this product?')" 
-                            class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 ml-1">Delete</button>
-                  </form>
-                </td>
-              </tr>
-              <% }) %>
-            <% } %>
+                    <td class="px-4 py-2 text-center">
+                      <input type="checkbox" class="toggle-active w-5 h-5 cursor-pointer" data-id="<%= p.id %>"
+                        <%=p.active ? 'checked' : '' %> />
+                    </td>
+
+                    <td class="px-4 py-2 last-update">
+                      <%= new Date(p.last_update).toLocaleString() %>
+                    </td>
+                    <td class="px-4 py-2 text-center">
+                      <button type="button"
+                        class="updateBtn bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">Update</button>
+                      <form action="/products/delete/<%= p.id %>" method="POST" class="inline">
+                        <button type="submit" onclick="return confirm('Delete this product?')"
+                          class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 ml-1">Delete</button>
+                      </form>
+                    </td>
+                  </tr>
+                  <% }) %>
+                    <% } %>
           </tbody>
         </table>
       </div>
-      <% if (typeof totalPages !== 'undefined' && totalPages > 1) { %>
+      <% if (typeof totalPages !=='undefined' && totalPages> 1) { %>
         <div class="flex justify-center mt-6 gap-2">
-          <% for (let i = 1; i <= totalPages; i++) { %>
-            <% if (i === currentPage) { %>
-              <span class="bg-blue-600 text-white px-3 py-1 rounded"><%= i %></span>
-            <% } else { %>
-              <a href="/products?page=<%= i %><%= search ? '&search=' + encodeURIComponent(search) : '' %>"
-                 class="bg-gray-200 text-gray-800 px-3 py-1 rounded hover:bg-gray-300">
-                 <%= i %>
-              </a>
-            <% } %>
-          <% } %>
+          <% for (let i=1; i <=totalPages; i++) { %>
+            <% if (i===currentPage) { %>
+              <span class="bg-blue-600 text-white px-3 py-1 rounded">
+                <%= i %>
+              </span>
+              <% } else { %>
+                <a href="/products?page=<%= i %><%= search ? '&search=' + encodeURIComponent(search) : '' %>"
+                  class="bg-gray-200 text-gray-800 px-3 py-1 rounded hover:bg-gray-300">
+                  <%= i %>
+                </a>
+                <% } %>
+                  <% } %>
         </div>
-      <% } %>
+        <% } %>
     </form>
   </div>
 
   <!-- ✅ Script section -->
-   <script>
-document.addEventListener('DOMContentLoaded', () => {
-  // === GLOBAL HELPERS ===
-  const loadingBar = document.getElementById('loading-bar');
-  const toast = document.getElementById('toast');
-  const toastMsg = document.getElementById('toast-message');
-  const batchBtn = document.getElementById('batchUpdateBtn');
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // === GLOBAL HELPERS ===
+      const loadingBar = document.getElementById('loading-bar');
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-message');
+      const batchBtn = document.getElementById('batchUpdateBtn');
 
-  function showLoadingBar() {
-    loadingBar.style.width = '0%';
-    loadingBar.classList.remove('hidden');
-    setTimeout(() => (loadingBar.style.width = '80%'), 50);
-  }
+      function showLoadingBar() {
+        loadingBar.style.width = '0%';
+        loadingBar.classList.remove('hidden');
+        setTimeout(() => (loadingBar.style.width = '80%'), 50);
+      }
 
-  function hideLoadingBar() {
-    loadingBar.style.width = '100%';
-    setTimeout(() => {
-      loadingBar.style.width = '0%';
-      loadingBar.classList.add('hidden');
-    }, 400);
-  }
+      function hideLoadingBar() {
+        loadingBar.style.width = '100%';
+        setTimeout(() => {
+          loadingBar.style.width = '0%';
+          loadingBar.classList.add('hidden');
+        }, 400);
+      }
 
-  function showToast(message, success = true) {
-    toastMsg.textContent = message;
-    toast.classList.remove('hidden');
-    toast.classList.toggle('bg-green-500', success);
-    toast.classList.toggle('bg-red-500', !success);
-    setTimeout(() => toast.classList.add('hidden'), 3000);
-  }
+      function showToast(message, success = true) {
+        toastMsg.textContent = message;
+        toast.classList.remove('hidden');
+        toast.classList.toggle('bg-green-500', success);
+        toast.classList.toggle('bg-red-500', !success);
+        setTimeout(() => toast.classList.add('hidden'), 3000);
+      }
 
-  // === TOGGLE ROW HIGHLIGHT & BUTTON STATE ===
-  function toggleRowHighlight(cb) {
-    const row = cb.closest('tr');
-    if (cb.checked) row.classList.add('bg-blue-50');
-    else row.classList.remove('bg-blue-50');
-  }
+      // === TOGGLE ROW HIGHLIGHT & BUTTON STATE ===
+      function toggleRowHighlight(cb) {
+        const row = cb.closest('tr');
+        if (cb.checked) row.classList.add('bg-blue-50');
+        else row.classList.remove('bg-blue-50');
+      }
 
-  function toggleBatchButton() {
-    const anyChecked = [...document.querySelectorAll('.selectRow')].some(cb => cb.checked);
-    batchBtn.disabled = !anyChecked;
-  }
+      function toggleBatchButton() {
+        const anyChecked = [...document.querySelectorAll('.selectRow')].some(cb => cb.checked);
+        batchBtn.disabled = !anyChecked;
+      }
 
-  // === CHECKBOX SELECTION HANDLING ===
-  const selectAll = document.getElementById('selectAll');
-  const checkboxes = document.querySelectorAll('.selectRow');
-  if (selectAll) {
-    selectAll.addEventListener('change', e => {
+      // === CHECKBOX SELECTION HANDLING ===
+      const selectAll = document.getElementById('selectAll');
+      const checkboxes = document.querySelectorAll('.selectRow');
+      if (selectAll) {
+        selectAll.addEventListener('change', e => {
+          checkboxes.forEach(cb => {
+            cb.checked = e.target.checked;
+            toggleRowHighlight(cb);
+          });
+          toggleBatchButton();
+        });
+      }
+
       checkboxes.forEach(cb => {
-        cb.checked = e.target.checked;
-        toggleRowHighlight(cb);
-      });
-      toggleBatchButton();
-    });
-  }
-
-  checkboxes.forEach(cb => {
-    cb.addEventListener('change', () => {
-      toggleRowHighlight(cb);
-      toggleBatchButton();
-    });
-  });
-
-  // === SINGLE ROW UPDATE HANDLER ===
-  document.querySelectorAll('.updateBtn').forEach(btn => {
-    btn.addEventListener('click', async e => {
-      const row = e.target.closest('tr');
-      const id = row.dataset.productId;
-      const qty = row.querySelector('input[name="qty[]"]').value;
-      const minimum_price = row.querySelector('input[name="minimum_price[]"]').value;
-      const update_interval = row.querySelector('select[name="update_interval[]"]').value;
-
-      showLoadingBar();
-      btn.disabled = true;
-      btn.textContent = 'Saving...';
-
-      try {
-        const res = await fetch(`/products/update/${id}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ qty, minimum_price, update_interval })
+        cb.addEventListener('change', () => {
+          toggleRowHighlight(cb);
+          toggleBatchButton();
         });
-
-        const result = await res.json();
-        hideLoadingBar();
-
-        if (result === true) {
-          showToast('✅ Product updated successfully!', true);
-          const lastUpdateCell = row.querySelector('.last-update');
-          if (lastUpdateCell)
-            lastUpdateCell.textContent = new Date().toLocaleString();
-          row.classList.add('bg-green-50');
-          setTimeout(() => row.classList.remove('bg-green-50'), 1500);
-        } else {
-          showToast('❌ Error updating product.', false);
-        }
-      } catch (err) {
-        console.error('Update failed:', err);
-        hideLoadingBar();
-        showToast('⚠️ Unexpected error during update.', false);
-      }
-
-      btn.disabled = false;
-      btn.textContent = 'Update';
-    });
-  });
-
-  // === TOAST AFTER BATCH UPDATE (SERVER REDIRECT) ===
-  const params = new URLSearchParams(window.location.search);
-  const status = params.get('status');
-  if (status) {
-    if (status === 'success')
-      showToast('✅ Batch update completed successfully!', true);
-    else
-      showToast('❌ Error during batch update.', false);
-    window.history.replaceState({}, document.title, '/products');
-  }
-
-
-
-
-   // === AUTO-FETCH PRODUCT INFO WHEN VP CODE ENTERED ===
-  const vpCodeInput = document.getElementById('vpCode');
-  const spinner = document.getElementById('spinner');
-  const mpidInput = document.getElementById('mpid');
-  const productNameInput = document.getElementById('product_name');
-
-  if (vpCodeInput) {
-    vpCodeInput.addEventListener('blur', async () => {
-      const vpCode = vpCodeInput.value.trim();
-      if (!vpCode) return;
-
-      spinner.classList.remove('hidden'); // show spinner
-
-      try {
-        // ✅ Call your backend route (no CORS issue)
-        const res = await fetch('/products/fetchProduct', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ vpCode })
-        });
-
-        if (!res.ok) throw new Error('API request failed');
-        const data = await res.json();
-
-        if (data.success) {
-          mpidInput.value = data.mpid || '';
-          productNameInput.value = data.description || '';
-        } else {
-          mpidInput.value = '';
-          productNameInput.value = '';
-          alert('No product data found for that VP Code.');
-        }
-      } catch (err) {
-        console.error('API fetch error:', err);
-        alert('Failed to fetch product info. Please try again.');
-      } finally {
-        spinner.classList.add('hidden'); // hide spinner
-      }
-    });
-  } 
-
-
-// === Add Product ===
-    document.getElementById('addProductBtn').addEventListener('click', async () => {
-      const sku = document.getElementById('vpCode').value.trim();
-      const mpid = document.getElementById('mpid').value.trim();
-      const product_name = document.getElementById('product_name').value.trim();
-      const product_url = document.getElementById('product_url').value.trim();
-      const active = document.getElementById('active').checked ? 1 : 0;
-
-      const rows = [...document.querySelectorAll('#priceBreaksTable tbody tr')];
-      const priceBreaks = [];
-      rows.forEach(r => {
-        const qty = r.querySelector('[name="qty[]"]').value;
-        const min = r.querySelector('[name="minimum_price[]"]').value;
-        const interval = r.querySelector('[name="update_interval[]"]').value;
-        if (qty && min && interval) priceBreaks.push({ qty, min, interval });
       });
 
-      if (!sku || priceBreaks.length === 0) {
-        alert('Enter VP Code & at least 1 price break');
-        return;
-      }
+      // === SINGLE ROW UPDATE HANDLER ===
+      document.querySelectorAll('.updateBtn').forEach(btn => {
+        btn.addEventListener('click', async e => {
+          const row = e.target.closest('tr');
+          const id = row.dataset.productId;
+          const qty = row.querySelector('input[name="qty[]"]').value;
+          const minimum_price = row.querySelector('input[name="minimum_price[]"]').value;
+          const update_interval = row.querySelector('select[name="update_interval[]"]').value;
 
-      try {
-        const res = await fetch('/products/add', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sku, mpid, product_name, product_url, active, priceBreaks })
+          showLoadingBar();
+          btn.disabled = true;
+          btn.textContent = 'Saving...';
+
+          try {
+            const res = await fetch(`/products/update/${id}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+              credentials: 'include',
+              body: JSON.stringify({ qty, minimum_price, update_interval })
+            });
+
+            const result = await res.json();
+            hideLoadingBar();
+
+            if (result === true) {
+              showToast('✅ Product updated successfully!', true);
+              const lastUpdateCell = row.querySelector('.last-update');
+              if (lastUpdateCell)
+                lastUpdateCell.textContent = new Date().toLocaleString();
+              row.classList.add('bg-green-50');
+              setTimeout(() => row.classList.remove('bg-green-50'), 1500);
+            } else {
+              showToast('❌ Error updating product.', false);
+            }
+          } catch (err) {
+            console.error('Update failed:', err);
+            hideLoadingBar();
+            showToast('⚠️ Unexpected error during update.', false);
+          }
+
+          btn.disabled = false;
+          btn.textContent = 'Update';
         });
-        if (res.ok) {
-          showToast('✅ Product added successfully!', true);
-          setTimeout(() => location.reload(), 1000);
-        } else {
-          showToast('❌ Failed to add product.', false);
-        }
-      } catch (err) {
-        console.error(err);
-        showToast('⚠️ Unexpected error while adding product.', false);
+      });
+
+      // === TOAST AFTER BATCH UPDATE (SERVER REDIRECT) ===
+      const params = new URLSearchParams(window.location.search);
+      const status = params.get('status');
+      if (status) {
+        if (status === 'success')
+          showToast('✅ Batch update completed successfully!', true);
+        else
+          showToast('❌ Error during batch update.', false);
+        window.history.replaceState({}, document.title, '/products');
       }
-    });
 
 
-    // === Toggle Active Column ===
-document.querySelectorAll('.toggle-active').forEach(toggle => {
-  toggle.addEventListener('change', async (e) => {
-    const id = e.target.dataset.id;
-    const isActive = e.target.checked ? 1 : 0;
+
+
+      // === AUTO-FETCH PRODUCT INFO WHEN VP CODE ENTERED ===
+      const vpCodeInput = document.getElementById('vpCode');
+      const spinner = document.getElementById('spinner');
+      const mpidInput = document.getElementById('mpid');
+      const productNameInput = document.getElementById('product_name');
+      const inventoryInput = document.getElementById('inventory');
+      const activeCheckbox = document.getElementById('active');
+      if (vpCodeInput) {
+        vpCodeInput.addEventListener('blur', async () => {
+          const vpCode = vpCodeInput.value.trim();
+          if (!vpCode) return;
+
+          spinner.classList.remove('hidden'); // show spinner
+
+          try {
+            // ✅ Call your backend route (no CORS issue)
+            const res = await fetch('/products/fetchProduct', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ vpCode })
+            });
+
+            if (!res.ok) throw new Error('API request failed');
+            const data = await res.json();
+            //alert(JSON.stringify(data));
+            if (data.success) {
+              mpidInput.value = data.mpid || '';
+              productNameInput.value = data.description || '';
+              //inventoryInput.value = data.inventory || 0;
+              activeCheckbox.checked = data.active === 1;
+
+              // ✅ Fill price breaks
+        const rows = document.querySelectorAll('#priceBreaksTable tbody tr');
+        rows.forEach((r, i) => {
+          const pb = data.priceBreaks[i];
+          if (pb) {
+            r.querySelector('[name="qty[]"]').value = pb.qty || '';
+            r.querySelector('[name="minimum_price[]"]').value = pb.minPrice || 0;
+            r.querySelector('[name="update_interval[]"]').value = pb.interval || 12;
+          } else {
+            // Clear any extra rows beyond API data
+            r.querySelector('[name="qty[]"]').value = '';
+            r.querySelector('[name="minimum_price[]"]').value = 0;
+            r.querySelector('[name="update_interval[]"]').value = 12;
+          }
+        });
+            } else {
+              mpidInput.value = '';
+              productNameInput.value = '';
+              inventoryInput.value = 0;
+              activeCheckbox.checked = false;
+              alert('No product data found for that VP Code.');
+            }
+          } catch (err) {
+            console.error('API fetch error:', err);
+            alert('Failed to fetch product info. Please try again.');
+          } finally {
+            spinner.classList.add('hidden'); // hide spinner
+          }
+        });
+      }
+
+
+      // === Add Product Starts === 
+      document.getElementById('addProductBtn').addEventListener('click', async () => {
+        const sku = document.getElementById('vpCode').value.trim();
+        const mpid = document.getElementById('mpid').value.trim();
+        const product_name = document.getElementById('product_name').value.trim();
+        const product_url = document.getElementById('product_url').value.trim();
+        const inventory = document.getElementById('inventory').value.trim();
+        const active = document.getElementById('active').checked ? 1 : 0;
+
+        const rows = [...document.querySelectorAll('#priceBreaksTable tbody tr')];
+        const priceBreaks = rows
+          .map(r => ({
+            qty: r.querySelector('[name="qty[]"]').value,
+            min: r.querySelector('[name="minimum_price[]"]').value,
+            interval: r.querySelector('[name="update_interval[]"]').value
+          }))
+          .filter(pb => pb.qty && pb.interval);
+
+        if (!sku || !mpid || !product_name || !product_url || !inventory) {
+          alert('All fields (MPID, Product Name, Product URL, Inventory) are required.');
+          return;
+        }
+
+        if (priceBreaks.length === 0) {
+          alert('Please enter at least one price break.');
+          return;
+        }
+
+        try {
+          const res = await fetch('/products/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sku, mpid, product_name, product_url, inventory, active, priceBreaks })
+          });
+
+          const data = await res.json();
+
+          if (res.ok && data.success) {
+            //alert('✅ Product(s) added successfully');
+            showToast('✅ Product(s) added successfully!', true);
+            location.reload();
+          } else {
+            alert(`⚠️ ${data.message || 'Server error while adding product.'}`);
+          }
+        } catch (err) {
+          console.error('Add product failed:', err);
+          alert('⚠️ Unexpected error while adding product.');
+        }
+
+      });
+
+      // === Add Product Ends ===
+
+
+      // === Toggle Active Column ===
+      document.querySelectorAll('.toggle-active').forEach(toggle => {
+        toggle.addEventListener('change', async (e) => {
+          const id = e.target.dataset.id;
+          const isActive = e.target.checked ? 1 : 0;
+
+          try {
+            const res = await fetch(`/products/updateActive/${id}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+              body: JSON.stringify({ active: isActive })
+            });
+
+            const result = await res.json();
+            if (result === true) {
+              showToast(`Active status updated to ${isActive ? '✅ Active' : '❌ Inactive'}`, true);
+            } else {
+              showToast('Error updating active status', false);
+            }
+          } catch (err) {
+            console.error('Toggle active failed:', err);
+            showToast('⚠️ Unexpected error updating active status', false);
+          }
+        });
+      });
+
+
+      // === Update Inventory ===
+document.querySelectorAll('.updateInventoryBtn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    debugger;
+    const id = btn.dataset.id;
+    const sku = btn.dataset.sku;
+    const mpid = btn.dataset.mpid;
+
+    btn.textContent = 'Updating...';
+    btn.disabled = true;
 
     try {
-      const res = await fetch(`/products/updateActive/${id}`, {
+      const res = await fetch('/products/updateInventory', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({ active: isActive })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, sku, mpid })
       });
 
-      const result = await res.json();
-      if (result === true) {
-        showToast(`Active status updated to ${isActive ? '✅ Active' : '❌ Inactive'}`, true);
+      const data = await res.json();
+
+      if (data.success) {
+        const row = btn.closest('tr');
+        const invInput = row.querySelector('input[name="inventory[]"]');
+        invInput.value = data.inventory;
+        showToast(`✅ Inventory updated to ${data.inventory}`, true);
       } else {
-        showToast('Error updating active status', false);
+        showToast(`⚠️ ${data.message || 'Failed to update inventory'}`, false);
       }
     } catch (err) {
-      console.error('Toggle active failed:', err);
-      showToast('⚠️ Unexpected error updating active status', false);
+      console.error('Inventory update failed:', err);
+      showToast('⚠️ Error contacting API or server.', false);
     }
+
+    btn.textContent = 'Update Inventory';
+    btn.disabled = false;
   });
 });
 
 
-});
+
+    });
 
 
 
-</script>
+  </script>
 
 </body>
+
 </html>

@@ -138,48 +138,108 @@ exports.batchUpdate = (req, res) => {
     });
   });
 };
-// ===================== ADD NEW PRODUCT =====================
+// ===================== ADD NEW PRODUCT STARTS =====================
 exports.addProduct = (req, res) => {
-  const { sku, mpid, product_name, product_url, active, priceBreaks } = req.body;
+  const { sku, mpid, product_name, product_url, inventory, active, priceBreaks } = req.body;
 
-  // Validate inputs
-  if (!sku || !priceBreaks || !Array.isArray(priceBreaks) || priceBreaks.length === 0) {
-    console.error('Invalid payload for addProduct');
-    return res.status(400).json({ success: false, message: 'Invalid payload' });
+  // 1️⃣ Validate required fields
+  if (!sku || !mpid || !product_name || !product_url || inventory == null) {
+    console.error("❌ Missing required fields");
+    return res.status(400).json({
+      success: false,
+      message: "MPID, Product Name, Product URL, and Inventory are required",
+    });
   }
 
-  // ✅ Use the first price break as the base record
-  const pb = priceBreaks[0];
+  if (!Array.isArray(priceBreaks) || priceBreaks.length === 0) {
+    return res.status(400).json({ success: false, message: "At least one price break is required" });
+  }
 
-  const sql = `
-    INSERT INTO products 
-      (sku, mpid, product_name, product_url, price, qty, minimum_price, update_interval, active, last_update)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
-  `;
+  // 2️⃣ Default values for min price & interval if missing
+  const finalPriceBreaks = priceBreaks.map(pb => ({
+    qty: pb.qty || 0,
+    min: pb.min || 0,
+    interval: pb.interval || 12, // default 12 hours
+  }));
 
-  const values = [
-    sku,
-    mpid || null,
-    product_name || null,
-    product_url || null,
-    parseFloat(pb.min),      // price = minimum_price
-    parseInt(pb.qty),
-    parseFloat(pb.min),
-    pb.interval,
-    active ? 1 : 0
-  ];
+  // 3️⃣ Check for duplicate SKU + Qty before insert
+  const checkSql = "SELECT COUNT(*) AS count FROM products WHERE sku = ? AND qty = ?";
+  let duplicateFound = false;
 
-  db.query(sql, values, (err, result) => {
-    if (err) {
-      console.error('Add product error:', err);
-      return res.status(500).json({ success: false, message: err.message });
-    }
-    console.log(`✅ Product '${sku}' inserted successfully.`);
-    return res.json({ success: true });
+  const checkNext = (index) => {
+    if (index >= finalPriceBreaks.length) {
+      if (duplicateFound) {
+        console.log("⚠️ Duplicate SKU+Qty found. Aborting insert.");
+        return res.status(400).json({
+          success: false,
+          message: "Duplicate SKU and Qty combination already exists. Aborting save.",
+        });
+      }
+
+      // 4️⃣ If no duplicates, insert all rows
+      const values = finalPriceBreaks.map(pb => [
+        sku,
+        mpid,
+        product_name,
+        product_url,
+        0, // default price (can be updated later)
+        parseInt(pb.qty),
+        parseFloat(pb.min),
+        pb.interval,
+        parseInt(inventory),
+        active ? 1 : 0,
+        new Date(),
+      ]);
+
+      const insertSql = `
+        INSERT INTO products 
+          (sku, mpid, product_name, product_url, price, qty, minimum_price, update_interval, inventory, active, last_update)
+        VALUES ?
+      `;
+
+      db.query(insertSql, [values], (err, result) => {
+       if (err) {
+  console.error("❌ Add product error:", err);
+
+  // Handle duplicate SKU or unique constraint errors nicely
+  if (err.code === "ER_DUP_ENTRY") {
+    return res.status(400).json({
+      success: false,
+      message: "Duplicate SKU already exists. Please use a different SKU.",
+    });
+  }
+
+  return res.status(500).json({
+    success: false,
+    message: "Database error. Please try again.",
   });
+}
+
+        console.log(`✅ ${result.affectedRows} product rows inserted.`);
+        return res.json({ success: true, message: "Product(s) added successfully" });
+      });
+      return;
+    }
+
+    // 🔄 Check for duplicates for current row
+    const pb = finalPriceBreaks[index];
+    db.query(checkSql, [sku, pb.qty], (err, results) => {
+      if (err) {
+        console.error("❌ Error checking duplicate SKU+Qty:", err);
+        return res.status(500).json({ success: false, message: "DB error" });
+      }
+
+      if (results[0].count > 0) {
+        duplicateFound = true;
+      }
+
+      checkNext(index + 1);
+    });
+  };
+
+  checkNext(0);
 };
-
-
+// ===================== ADD NEW PRODUCT ENDS=====================
 
 // ===================== DELETE PRODUCT =====================
 exports.deleteProduct = (req, res) => {
@@ -206,6 +266,8 @@ exports.deleteProduct = (req, res) => {
 
   try {
      //change your url accordingly
+
+     //for testing purpose 
     const apiUrl = `https://raw.githubusercontent.com/freelancerking/net32/refs/heads/main/${vpCode}.json`;
       // ✅ POST body (payload)
     const payload = {
@@ -222,7 +284,11 @@ exports.deleteProduct = (req, res) => {
       'Subscription-Key': process.env.SUBSCRIPTION_KEY || 'YOUR_SUBSCRIPTION_KEY_HERE',
       'Content-Type': 'application/json'
     };
-    const response = await axios.post(apiUrl, payload, { headers });
+
+    //production purpose
+   //const apiUrl = `https://raw.githubusercontent.com/freelancerking/net32/refs/heads/main/${vpCode}.json`;
+  const response = await axios.post(apiUrl, payload, { headers });
+   //const response = await axios.get(apiUrl, { responseType: "json" });
 
     const result = response.data?.payload?.result?.[0];
     if (!result) {
@@ -231,16 +297,27 @@ exports.deleteProduct = (req, res) => {
 
     const mpid = result.mpid ?? null;
     const description = result.description ?? "";
+    //const inventory = result.inventory ?? 0;
+    const active = result.priceList?.find(p => p.activeCd === 1) ? 1 : 0;
 
-    console.log("✅ Extracted from API:", { mpid, description });
-    return res.json({ success: true, mpid, description });
+    // ✅ Extract up to 5 price breaks
+      const priceBreaks = (result.priceList || [])
+        .slice(0, 5)
+        .map(p => ({
+          qty: p.minQty,
+          minPrice: p.price,
+          interval: 12, // default hours
+        }));
+
+    console.log("✅ Extracted from API:", { mpid, description, priceBreaks, active });
+    return res.json({ success: true, mpid, description, active, priceBreaks });
   } catch (err) {
     console.error("❌ fetchProduct error:", err.message);
     return res.status(500).json({ success: false, message: err.message });
   }
 };
- 
-// ===================== FETCH PRODUCT DATA FROM EXTERNAL API =====================
+
+// ===================== FETCH PRODUCT DATA FROM EXTERNAL API START =====================
 
 
 exports.updateActive = (req, res) => {
@@ -267,6 +344,45 @@ exports.updateActive = (req, res) => {
   });
 };
 
+// ===================== FETCH PRODUCT DATA FROM EXTERNAL API ENDS =====================
+
+// ===================== UPDATE INVENTORY =====================
+exports.updateInventory = (req, res) => {
+  const axios = require("axios");
+  const { id, sku, mpid } = req.body;
+
+  if (!id || !sku || !mpid) {
+    return res.status(400).json({ success: false, message: "Missing required fields" });
+  }
+
+  const url = `https://raw.githubusercontent.com/freelancerking/net32/refs/heads/main/${sku}.json`;
+
+  axios.get(url, { responseType: "json" })
+    .then(response => {
+      const result = response.data?.payload?.result?.[0];
+      if (!result) {
+        return res.status(404).json({ success: false, message: "No product data found from API" });
+      }
+
+      const newInventory = result.inventory ?? 0;
+
+      // ✅ Update DB
+      const sql = "UPDATE products SET inventory = ?, last_update = NOW() WHERE id = ?";
+      db.query(sql, [newInventory, id], (err) => {
+        if (err) {
+          console.error("❌ DB Update Error:", err);
+          return res.status(500).json({ success: false, message: "Database error while updating inventory" });
+        }
+
+        console.log(`✅ Inventory updated for SKU ${sku}: ${newInventory}`);
+        return res.json({ success: true, inventory: newInventory });
+      });
+    })
+    .catch(err => {
+      console.error("❌ API Fetch Error:", err.message);
+      return res.status(500).json({ success: false, message: "API fetch failed" });
+    });
+};
 
 
 

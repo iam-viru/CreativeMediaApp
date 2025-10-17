@@ -16,4 +16,7 @@ router.post('/fetchProduct', productController.fetchProduct);
 
 router.post('/updateActive/:id', productController.updateActive);
 
+router.post('/updateInventory', productController.updateInventory);
+
+
 module.exports = router;
