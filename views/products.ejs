@@ -200,11 +200,17 @@
                     </td>
                   
                     <td class="px-4 py-2 ">
-  <input type="number" name="inventory[]" value="<%= p.inventory || 0 %>" 
-         class="border p-1 rounded w-20 text-center" />
-   <button type="button" class="updateBtn bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700" data-id="<%= p.id %>"
-          data-sku="<%= p.sku %>"
-          data-mpid="<%= p.mpid %>">Update </button>
+ <div class="flex items-center gap-2">
+    <input type="number" 
+           name="inventory[]" 
+           value="<%= p.inventory %>" 
+           class="border p-1 rounded w-20 text-center" />
+    <button type="button"
+            class="updateInventoryBtn bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+            data-id="<%= p.id %>">
+      Update
+    </button>
+  </div>
 </td>
 
                     <td class="px-4 py-2 text-center">
@@ -514,46 +520,42 @@
       });
 
 
-      // === Update Inventory ===
+      // === Update Inventory === 
 document.querySelectorAll('.updateInventoryBtn').forEach(btn => {
-  btn.addEventListener('click', async () => {
-    debugger;
-    const id = btn.dataset.id;
-    const sku = btn.dataset.sku;
-    const mpid = btn.dataset.mpid;
+  btn.addEventListener('click', async (e) => {
+    const id = btn.getAttribute('data-id');
+    const row = btn.closest('tr');
+    const inventory = row.querySelector('input[name="inventory[]"]').value.trim();
 
-    btn.textContent = 'Updating...';
+    if (!inventory) return alert('Please enter an inventory value');
+
+    spinner.classList.remove('hidden');
     btn.disabled = true;
+    btn.textContent = 'Updating...';
 
     try {
-      const res = await fetch('/products/updateInventory', {
+      const res = await fetch(`/products/updateInventory/${id}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, sku, mpid })
+        body: JSON.stringify({ inventory })
       });
 
       const data = await res.json();
-
       if (data.success) {
-        const row = btn.closest('tr');
-        const invInput = row.querySelector('input[name="inventory[]"]');
-        invInput.value = data.inventory;
-        showToast(`✅ Inventory updated to ${data.inventory}`, true);
+        alert('✅ Inventory updated successfully!');
       } else {
-        showToast(`⚠️ ${data.message || 'Failed to update inventory'}`, false);
+        alert('❌ ' + (data.message || 'Failed to update inventory.'));
       }
     } catch (err) {
       console.error('Inventory update failed:', err);
-      showToast('⚠️ Error contacting API or server.', false);
+      alert('⚠️ Server error while updating inventory.');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Update';
+      spinner.classList.add('hidden');
     }
-
-    btn.textContent = 'Update Inventory';
-    btn.disabled = false;
   });
 });
-
-
-
     });
 
 
