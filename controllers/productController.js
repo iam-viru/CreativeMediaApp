@@ -96,7 +96,9 @@ exports.updateProduct = (req, res) => {
 };
 // Batch update (multi-row form submission)
 exports.batchUpdate = (req, res) => {
-  const { id, qty, minimum_price, update_interval, selected } = req.body;
+  console.log('Batch update request body:', req.body);
+  const { id, qty, minimum_price, update_hours,  
+    update_minutes, selected } = req.body;
 
   if (!selected || !Array.isArray(selected) || selected.length === 0) {
     console.log('No rows selected for update');
@@ -105,8 +107,11 @@ exports.batchUpdate = (req, res) => {
 
   const updates = [];
   for (let i = 0; i < id.length; i++) {
-    if (selected.includes(id[i])) {
-      updates.push([qty[i], minimum_price[i], update_interval[i], id[i]]);
+    if (selected.includes(id[i])) { 
+      const hours = update_hours && update_hours[i] ? parseInt(update_hours[i]) || 0 : 0;
+      const minutes = update_minutes && update_minutes[i] ? parseInt(update_minutes[i]) || 0 : 0;
+      const totalInterval = (hours * 60) + minutes;
+      updates.push([qty[i], minimum_price[i], totalInterval, id[i]]);
     }
   }
 
@@ -177,7 +182,10 @@ exports.addProduct = (req, res) => {
           message: "Duplicate SKU and Qty combination already exists. Aborting save.",
         });
       }
-const inv = inventory ? parseInt(inventory) : 9999; // default to 9999
+const inv = inventory && !isNaN(inventory) && Number(inventory) > 0
+  ? parseInt(inventory)
+  : 9999; // default if blank or invalid
+
       // 4️⃣ If no duplicates, insert all rows
       const values = finalPriceBreaks.map(pb => [
         sku,

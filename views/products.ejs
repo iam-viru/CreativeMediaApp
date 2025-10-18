@@ -68,9 +68,9 @@
         </div>
         <div>
           <label class="text-sm font-medium">Inventory</label>
-          <input id="inventory" name="inventory" type="number" required class="border rounded p-2 w-full" />
+          <input id="inventory" name="inventory" type="number" required class="border rounded p-2 w-full" value="9999" />
         </div>
-      <!-- <div class="flex items-center mt-6 gap-2">
+        <!-- <div class="flex items-center mt-6 gap-2">
           <input id="active" name="active" type="checkbox" checked class="w-4 h-4" />
           <label for="active" class="text-sm font-medium">Active</label>
         </div>-->
@@ -81,9 +81,9 @@
         <thead class="bg-gray-200 text-gray-700 text-sm">
           <tr>
             <th class="px-3 py-2 text-left">Qty</th>
-<th class="px-3 py-2 text-left">Min Price</th>
-<th class="px-3 py-2 text-left">Interval</th>
-<th class="px-3 py-2 text-left">Active</th>
+            <th class="px-3 py-2 text-left">Min Price</th>
+            <th class="px-3 py-2 text-left">Interval</th>
+            <th class="px-3 py-2 text-left">Active</th>
           </tr>
         </thead>
         <tbody>
@@ -93,17 +93,23 @@
               <td class="px-3 py-2"><input name="minimum_price[]" type="number" step="0.01" value="0"
                   class="border p-1 rounded w-24"></td>
               <td class="px-3 py-2">
-                <select name="update_interval[]" class="border p-1 rounded w-28">
-                  <option value="">--</option>
-                  <option value="720">12 hours</option>
-                  <option value="750">12 hours 30 minutes</option>
-                  <option value="780">13 hours</option>
-                  <option value="1440">24 hours</option>
-                </select>
+                <div class="flex items-center gap-2">
+                  <!-- Hours -->
+                  <select name="update_hours[]" class="border p-1 rounded w-28">
+                    <option value="12">12 hours</option>
+                    <option value="13">13 hours</option>
+                    <option value="14">14 hours</option>
+                    <option value="24">24 hours</option>
+                  </select>
+                  <!-- Minutes -->
+                  <input type="number" name="update_minutes[]" min="0" max="59" value="0"
+                    class="border p-1 rounded w-20 text-center" placeholder="min" title="Minutes (0–59)" />
+                </div>
               </td>
+
               <td class="px-3 py-2 text-center">
-  <input type="checkbox" name="activeCd[]" value="1" class="w-5 h-5" checked />
-</td>
+                <input type="checkbox" name="activeCd[]" value="1" class="w-5 h-5" checked />
+              </td>
             </tr>
             <% } %>
         </tbody>
@@ -153,106 +159,126 @@
               <th class="px-4 py-2 text-left">Min Price ($)</th>
               <th class="px-4 py-2 text-left">Update Interval (hours)</th>
               <th class="px-4 py-2 text-left">Inventory</th>
-
               <th class="px-4 py-2 text-left">Active</th>
               <th class="px-4 py-2 text-left">Last Update</th>
               <th class="px-4 py-2 text-center">Actions</th>
             </tr>
           </thead>
-           <tbody>
-  <% if (products.length === 0) { %>
-    <tr>
-      <td colspan="12" class="text-center py-6 text-gray-500">No products found</td>
-    </tr>
-  <% } else { %>
-    <% 
-      let prevSku = null;
-      let prevProductName = null;
-    %>
-    <% products.forEach(p => { %>
-      <tr class="border-b hover:bg-gray-50" data-product-id="<%= p.id %>">
-        <td class="px-4 py-2 text-center">
-          <input type="checkbox" name="selected[]" value="<%= p.id %>" class="selectRow cursor-pointer">
-        </td>
+          <tbody>
+            <% if (products.length===0) { %>
+              <tr>
+                <td colspan="12" class="text-center py-6 text-gray-500">No products found</td>
+              </tr>
+              <% } else { %>
+                <% let prevSku=null; let prevProductName=null; %>
+                  <% products.forEach(p=> { %>
+                    <tr class="border-b hover:bg-gray-50" data-product-id="<%= p.id %>">
+                      <td class="px-4 py-2 text-center">
+                        <input type="checkbox" name="selected[]" value="<%= p.id %>" class="selectRow cursor-pointer">
+                      </td>
 
-        <!-- SKU (hide if same as previous) -->
-        <% if (p.sku !== prevSku) { %>
-          <td class="px-4 py-2"><%= p.sku %></td>
-        <% } else { %>
-          <td class="px-4 py-2"></td>
-        <% } %>
+                      <!-- SKU (hide if same as previous) -->
+                      <% if (p.sku !==prevSku) { %>
+                        <td class="px-4 py-2">
+                          <%= p.sku %>
+                        </td>
+                        <% } else { %>
+                          <td class="px-4 py-2"></td>
+                          <% } %>
 
-        <td class="px-4 py-2"><%= p.mpid %></td>
+                            <td class="px-4 py-2">
+                              <%= p.mpid %>
+                            </td>
 
-        <!-- Product Name (hide if same as previous) -->
-        <% if (p.product_name !== prevProductName) { %>
-          <td class="px-4 py-2"><%= p.product_name %></td>
-        <% } else { %>
-          <td class="px-4 py-2"></td>
-        <% } %>
+                            <!-- Product Name (hide if same as previous) -->
+                            <% if (p.product_name !==prevProductName) { %>
+                              <td class="px-4 py-2">
+                                <%= p.product_name %>
+                              </td>
+                              <% } else { %>
+                                <td class="px-4 py-2"></td>
+                                <% } %>
 
-        <td class="px-4 py-2 text-blue-600 underline">
-          <a href="<%= p.product_url %>" target="_blank"><%= p.product_url %></a>
-        </td>
+                                  <td class="px-4 py-2 text-blue-600 underline">
+                                    <a href="<%= p.product_url %>" target="_blank">
+                                      <%= p.product_url %>
+                                    </a>
+                                  </td>
 
-        <td class="px-4 py-2"><%= parseFloat(p.price).toFixed(2) %></td>
+                                  <td class="px-4 py-2">
+                                    <%= parseFloat(p.price).toFixed(2) %>
+                                  </td>
 
-        <td class="px-4 py-2">
-          <input type="hidden" name="id[]" value="<%= p.id %>">
-          <input type="number" name="qty[]" value="<%= p.qty %>"
-            class="border p-1 rounded w-20 text-center" />
-        </td>
+                                  <td class="px-4 py-2">
+                                    <input type="hidden" name="id[]" value="<%= p.id %>">
+                                    <input type="number" name="qty[]" value="<%= p.qty %>"
+                                      class="border p-1 rounded w-20 text-center" />
+                                  </td>
 
-        <td class="px-4 py-2">
-          <input type="number" step="0.01" name="minimum_price[]" value="<%= p.minimum_price %>"
-            class="border p-1 rounded w-24 text-center" />
-        </td>
+                                  <td class="px-4 py-2">
+                                    <input type="number" step="0.01" name="minimum_price[]"
+                                      value="<%= p.minimum_price %>" class="border p-1 rounded w-24 text-center" />
+                                  </td>
 
-       <td class="px-4 py-2">
-  <select name="update_interval[]" class="border p-1 rounded w-32 text-center">
-    <option value="720" <%= parseInt(p.update_interval) === 720 ? 'selected' : '' %>>12 hours</option>
-    <option value="750" <%= parseInt(p.update_interval) === 750 ? 'selected' : '' %>>12 hours 30 minutes</option>
-    <option value="780" <%= parseInt(p.update_interval) === 780 ? 'selected' : '' %>>13 hours</option>
-    <option value="1440" <%= parseInt(p.update_interval) === 1440 ? 'selected' : '' %>>24 hours</option>
-  </select>
-</td>
+                                  <td class="px-4 py-2">
+                                    <div class="flex items-center gap-2">
+                                      <!-- Hours Dropdown -->
+                                      <select name="update_hours[]" class="border p-1 rounded w-24 text-center">
+                                        <option value="12" <%=Math.floor(p.update_interval / 60)===12 ? 'selected' : ''
+                                          %>>12</option>
+                                        <option value="13" <%=Math.floor(p.update_interval / 60)===13 ? 'selected' : ''
+                                          %>>13</option>
+                                        <option value="14" <%=Math.floor(p.update_interval / 60)===14 ? 'selected' : ''
+                                          %>>14</option>
+                                        <option value="24" <%=Math.floor(p.update_interval / 60)===24 ? 'selected' : ''
+                                          %>>24</option>
+                                      </select>
+
+                                      <!-- Minutes Textbox -->
+                                      <input type="number" name="update_minutes[]" min="0" max="59"
+                                        value="<%= p.update_interval % 60 %>"
+                                        class="border p-1 rounded w-16 text-center" placeholder="min"
+                                        title="Minutes (0–59)" />
+                                    </div>
+                                  </td>
 
 
-        <td class="px-4 py-2">
-          <div class="flex items-center gap-2">
-            <input type="number" name="inventory[]" value="<%= p.inventory %>"
-              class="border p-1 rounded w-20 text-center" />
-            <button type="button"
-              class="updateInventoryBtn bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
-              data-id="<%= p.id %>">
-              Update
-            </button>
-          </div>
-        </td>
 
-        <td class="px-4 py-2 text-center">
-          <input type="checkbox" class="toggle-active w-5 h-5 cursor-pointer" data-id="<%= p.id %>"
-            <%= p.active ? 'checked' : '' %> />
-        </td>
+                                  <td class="px-4 py-2">
+                                    <div class="flex items-center gap-2">
+                                      <input type="number" name="inventory[]" value="<%= p.inventory %>"
+                                        class="border p-1 rounded w-20 text-center" />
+                                      <button type="button"
+                                        class="updateInventoryBtn bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+                                        data-id="<%= p.id %>">
+                                        Update
+                                      </button>
+                                    </div>
+                                  </td>
 
-        <td class="px-4 py-2 last-update">
-          <%= new Date(p.last_update).toLocaleString() %>
-        </td>
+                                  <td class="px-4 py-2 text-center">
+                                    <input type="checkbox" class="toggle-active w-5 h-5 cursor-pointer"
+                                      data-id="<%= p.id %>" <%=p.active ? 'checked' : '' %> />
+                                  </td>
 
-        <td class="px-4 py-2 text-center">
-          <button type="button"
-            class="updateBtn bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">Update</button>
-          <form action="/products/delete/<%= p.id %>" method="POST" class="inline">
-            <button type="submit" onclick="return confirm('Delete this product?')"
-              class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 ml-1">Delete</button>
-          </form>
-        </td>
-      </tr>
+                                  <td class="px-4 py-2 last-update">
+                                    <%= new Date(p.last_update).toLocaleString() %>
+                                  </td>
 
-      <% prevSku = p.sku; prevProductName = p.product_name; %>
-    <% }) %>
-  <% } %>
-</tbody>
+                                  <td class="px-4 py-2 text-center">
+                                    <button type="button"
+                                      class="updateBtn bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">Update</button>
+                                    <form action="/products/delete/<%= p.id %>" method="POST" class="inline">
+                                      <button type="submit" onclick="return confirm('Delete this product?')"
+                                        class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 ml-1">Delete</button>
+                                    </form>
+                                  </td>
+                    </tr>
+
+                    <% prevSku=p.sku; prevProductName=p.product_name; %>
+                      <% }) %>
+                        <% } %>
+          </tbody>
 
         </table>
       </div>
@@ -278,10 +304,10 @@
   <!-- Script section Starts-->
   <script>
     function formatInterval(minutes) {
-  const hrs = Math.floor(minutes / 60);
-  const mins = minutes % 60;
-  return mins ? `${hrs}h ${mins}m` : `${hrs}h`;
-}
+      const hrs = Math.floor(minutes / 60);
+      const mins = minutes % 60;
+      return mins ? `${hrs}h ${mins}m` : `${hrs}h`;
+    }
 
     document.addEventListener('DOMContentLoaded', () => {
       // === GLOBAL HELPERS ===
@@ -351,7 +377,17 @@
           const id = row.dataset.productId;
           const qty = row.querySelector('input[name="qty[]"]').value;
           const minimum_price = row.querySelector('input[name="minimum_price[]"]').value;
-          const update_interval = row.querySelector('select[name="update_interval[]"]').value;
+          // Get hours & minutes fields
+const hoursEl = row.querySelector('select[name="update_hours[]"]');
+const minsEl = row.querySelector('input[name="update_minutes[]"]');
+
+// Default to 0 if missing
+const hours = hoursEl ? parseInt(hoursEl.value) || 0 : 0;
+const minutes = minsEl ? parseInt(minsEl.value) || 0 : 0;
+
+// Convert total interval to minutes
+const update_interval = (hours * 60) + minutes;
+
 
           showLoadingBar();
           btn.disabled = true;
@@ -474,16 +510,22 @@
         const product_url = document.getElementById('product_url').value.trim();
         const inventory = document.getElementById('inventory').value.trim();
         const active = document.getElementById('active').checked ? 1 : 0;
-debugger;
+        debugger;
         const rows = [...document.querySelectorAll('#priceBreaksTable tbody tr')];
-        const priceBreaks = rows
-          .map(r => ({
-            qty: r.querySelector('[name="qty[]"]').value,
-            min: r.querySelector('[name="minimum_price[]"]').value,
-            interval: r.querySelector('[name="update_interval[]"]').value,
-            activeCd: r.querySelector('[name="activeCd[]"]')?.checked ? 1 : 0
-          }))
-          .filter(pb => pb.qty && pb.interval);
+        const priceBreaks = rows.map(r => {
+          const qty = r.querySelector('[name="qty[]"]').value;
+          const min = r.querySelector('[name="minimum_price[]"]').value;
+          const hours = parseInt(r.querySelector('[name="update_hours[]"]').value || '12', 10);
+          const minutes = parseInt(r.querySelector('[name="update_minutes[]"]').value || '0', 10);
+
+          // clamp minutes 0–59 (just in case)
+          const safeMinutes = Math.min(Math.max(minutes, 0), 59);
+
+          // total interval in minutes
+          const interval = (hours * 60) + safeMinutes;
+
+          return { qty, min, interval };
+        }).filter(pb => pb.qty && pb.interval);
 
         if (!sku || !mpid || !product_name || !product_url || !inventory) {
           alert('All fields (MPID, Product Name, Product URL, Inventory) are required.');
