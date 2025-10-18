@@ -1,4 +1,5 @@
 const db = require('../config/db');
+
 // Fetch all products (with pagination + search + fixed sorting)
 exports.getProducts = (req, res) => {
   const search = req.query.search || '';
@@ -159,7 +160,8 @@ exports.addProduct = (req, res) => {
   const finalPriceBreaks = priceBreaks.map(pb => ({
     qty: pb.qty || 0,
     min: pb.min || 0,
-    interval: pb.interval || 12, // default 12 hours
+    interval: pb.interval || 720, // default 12 hours (in minutes)
+    activeCd: pb.activeCd || 0
   }));
 
   // 3️⃣ Check for duplicate SKU + Qty before insert
@@ -175,7 +177,7 @@ exports.addProduct = (req, res) => {
           message: "Duplicate SKU and Qty combination already exists. Aborting save.",
         });
       }
-
+const inv = inventory ? parseInt(inventory) : 9999; // default to 9999
       // 4️⃣ If no duplicates, insert all rows
       const values = finalPriceBreaks.map(pb => [
         sku,
@@ -186,8 +188,8 @@ exports.addProduct = (req, res) => {
         parseInt(pb.qty),
         parseFloat(pb.min),
         pb.interval,
-        parseInt(inventory),
-        active ? 1 : 0,
+        inv,
+        pb.activeCd, // ✅ Active per price break
         new Date(),
       ]);
 
@@ -318,8 +320,6 @@ exports.deleteProduct = (req, res) => {
 };
 
 // ===================== FETCH PRODUCT DATA FROM EXTERNAL API START =====================
-
-
 exports.updateActive = (req, res) => {
   const { id } = req.params;
   const { active } = req.body;
@@ -343,11 +343,9 @@ exports.updateActive = (req, res) => {
     res.redirect('/products?status=success');
   });
 };
-
 // ===================== FETCH PRODUCT DATA FROM EXTERNAL API ENDS =====================
-
 // ===================== UPDATE INVENTORY =====================
- // ✅ Update Inventory (calls external API, then updates DB)
+ // Update Inventory (calls external API, then updates DB)
 exports.updateInventory = async (req, res) => {
   const axios = require("axios");
   const { id } = req.params;
@@ -371,7 +369,7 @@ exports.updateInventory = async (req, res) => {
         mpid: product.mpid,
         priceList: [],
         fulfillmentPolicy: "stock",
-        pht: 5,
+        pht: 1,
         inventory: parseInt(inventory)
       };
 
@@ -385,7 +383,7 @@ exports.updateInventory = async (req, res) => {
             headers: {
               "Content-Type": "application/json",
               "Cache-Control": "no-cache",
-              "Subscription-Key": "YOUR_SUBSCRIPTION_KEY_HERE"
+               'Subscription-Key': process.env.INVENTORY_SUBSCRIPTION_KEY || 'YOUR_SUBSCRIPTION_KEY_HERE',
             },
             timeout: 5000
           }
