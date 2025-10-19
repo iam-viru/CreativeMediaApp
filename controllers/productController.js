@@ -323,6 +323,13 @@ exports.deleteProduct = (req, res) => {
     return res.json({ success: true, mpid, description, active, priceBreaks });
   } catch (err) {
     console.error("❌ fetchProduct error:", err.message);
+    // ✅ Handle 403 separately
+    if (err.response && err.response.status === 403) {
+      return res.status(403).json({
+        success: false,
+        message: "Access forbidden. Check your Subscription Key or API permission."
+      });
+    }
     return res.status(500).json({ success: false, message: err.message });
   }
 };
