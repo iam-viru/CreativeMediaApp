@@ -1,5 +1,5 @@
 const db = require('../config/db');
-
+const { API_HEADERS, BASE_API_URL } = require('../config/apiConfig');
 // Fetch all products (with pagination + search + fixed sorting)
 exports.getProducts = (req, res) => {
   const search = req.query.search || '';
@@ -146,7 +146,7 @@ exports.batchUpdate = (req, res) => {
 };
 // ===================== ADD NEW PRODUCT STARTS =====================
 exports.addProduct = (req, res) => {
-  const { sku, mpid, product_name, product_url, inventory, active, priceBreaks } = req.body;
+  const { sku, mpid, product_name, product_url, inventory, priceBreaks } = req.body;
 
   // 1️⃣ Validate required fields
   if (!sku || !mpid || !product_name || !product_url || inventory == null) {
@@ -194,10 +194,10 @@ const inv = inventory && !isNaN(inventory) && Number(inventory) > 0
         product_url,
         0, // default price (can be updated later)
         parseInt(pb.qty),
-        parseFloat(pb.min),
+        parseFloat(pb.min || 0),
         pb.interval,
         inv,
-        pb.activeCd, // ✅ Active per price break
+        pb.activeCd ?? 1, // ✅ Active per price break
         new Date(),
       ]);
 
@@ -352,26 +352,27 @@ exports.updateActive = (req, res) => {
   });
 };
 // ===================== FETCH PRODUCT DATA FROM EXTERNAL API ENDS =====================
+
 // ===================== UPDATE INVENTORY =====================
  // Update Inventory (calls external API, then updates DB)
-exports.updateInventory = async (req, res) => {
+ exports.updateInventory = async (req, res) => {
   const axios = require("axios");
-  const { id } = req.params;
-  const { inventory } = req.body;
+  const { sku, inventory } = req.body;
 
-  if (!id || !inventory)
-    return res.status(400).json({ success: false, message: "Missing inventory or product id" });
+  if (!sku || inventory == null) {
+    return res.status(400).json({ success: false, message: "SKU and inventory are required" });
+  }
 
   try {
-    // ✅ Fetch product info from DB
-    const sqlSelect = "SELECT sku, mpid FROM products WHERE id = ?";
-    db.query(sqlSelect, [id], async (err, results) => {
+    // ✅ Fetch product info from DB using SKU
+    const sqlSelect = "SELECT sku, mpid FROM products WHERE sku = ?";
+    db.query(sqlSelect, [sku], async (err, results) => {
       if (err || results.length === 0)
         return res.status(404).json({ success: false, message: "Product not found" });
 
       const product = results[0];
 
-      // ✅ Prepare API payload (everything fixed except inventory)
+      // ✅ Prepare API payload (fixed except inventory)
       const payload = {
         vpCode: product.sku,
         mpid: product.mpid,
@@ -381,17 +382,18 @@ exports.updateInventory = async (req, res) => {
         inventory: parseInt(inventory)
       };
 
-      console.log("Sending inventory update payload:", payload);
+      console.log("📦 Sending inventory update payload:", payload);
 
       try {
-        //change your url accordingly
-        const response = await axios.post(`https://raw.githubusercontent.com/freelancerking/net32/refs/heads/main/${product.sku}.json`, 
+        // ✅ External API call
+        const response = await axios.post(
+          `https://raw.githubusercontent.com/freelancerking/net32/refs/heads/main/${product.sku}.json`,
           payload,
           {
             headers: {
               "Content-Type": "application/json",
               "Cache-Control": "no-cache",
-               'Subscription-Key': process.env.INVENTORY_SUBSCRIPTION_KEY || 'YOUR_SUBSCRIPTION_KEY_HERE',
+              "Subscription-Key": process.env.INVENTORY_SUBSCRIPTION_KEY || "YOUR_SUBSCRIPTION_KEY_HERE"
             },
             timeout: 5000
           }
@@ -399,9 +401,9 @@ exports.updateInventory = async (req, res) => {
 
         console.log("✅ API Response Status:", response.status);
 
-        // ✅ Update inventory in DB
-        const sqlUpdate = "UPDATE products SET inventory = ?, last_update = NOW() WHERE id = ?";
-        db.query(sqlUpdate, [inventory, id], (err2) => {
+        // ✅ Update DB (by SKU)
+        const sqlUpdate = "UPDATE products SET inventory = ?, last_update = NOW() WHERE sku = ?";
+        db.query(sqlUpdate, [inventory, sku], (err2) => {
           if (err2) {
             console.error("❌ DB update failed:", err2.message);
             return res.status(500).json({ success: false, message: "DB update failed" });
@@ -419,6 +421,7 @@ exports.updateInventory = async (req, res) => {
     return res.status(500).json({ success: false, message: err.message });
   }
 };
+// ===================== UPDATE INVENTORY ENDS =====================
 
 
 
