@@ -480,7 +480,8 @@ if (vpCodeInput) {
       });
 
       const data = await res.json();
-
+      console.log('Fetched product data:', data);
+      debugger;
       if (!data.success) {
         alert(`⚠️ ${data.message || 'No product data found for that VP Code.'}`);
         mpidInput.value = '';
@@ -491,10 +492,10 @@ if (vpCodeInput) {
       }
 
       // ✅ Correct structure (data.data)
-      const product = data.data;
+      const product = data;
       mpidInput.value = product.mpid || '';
       productNameInput.value = product.description || '';
-      activeCheckbox.checked = product.active === 1;
+      //activeCheckbox.checked = product.active === 1;
       inventoryInput.value = product.inventory ?? 9999;
 
       // ✅ Fill price breaks dynamically
