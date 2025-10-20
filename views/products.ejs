@@ -96,10 +96,10 @@
                 <div class="flex items-center gap-2">
                   <!-- Hours -->
                   <select name="update_hours[]" class="border p-1 rounded w-28">
-                    <option value="12">12 hours</option>
-                    <option value="13">13 hours</option>
-                    <option value="14">14 hours</option>
-                    <option value="24">24 hours</option>
+                    <option value="12">12 </option>
+                    <option value="13">13 </option>
+                    <option value="14">14 </option>
+                    <option value="24">24 </option>
                   </select>
                   <!-- Minutes -->
                   <input type="number" name="update_minutes[]" min="0" max="59" value="0"
@@ -455,8 +455,7 @@ const update_interval = (hours * 60) + minutes;
 
 
 
-      // === AUTO-FETCH PRODUCT INFO WHEN VP CODE ENTERED ===
-      // === AUTO-FETCH PRODUCT INFO WHEN VP CODE ENTERED ===
+      // === AUTO-FETCH PRODUCT INFO WHEN VP CODE ENTERED === 
 const vpCodeInput = document.getElementById('vpCode');
 const spinner = document.getElementById('spinner');
 const mpidInput = document.getElementById('mpid');
@@ -625,26 +624,29 @@ if (vpCodeInput) {
 
 
       // === Update Inventory === 
-       document.querySelectorAll('.updateInventoryBtn').forEach(btn => {
+  document.querySelectorAll('.updateInventoryBtn').forEach(btn => {
   btn.addEventListener('click', async (e) => {
     const sku = btn.getAttribute('data-sku'); // ✅ use SKU instead of ID
     const row = btn.closest('tr');
     const inventory = row.querySelector('input[name="inventory[]"]').value.trim();
 
     if (!inventory) return alert('Please enter an inventory value');
-
+debugger;
     spinner.classList.remove('hidden');
     btn.disabled = true;
     btn.textContent = 'Updating...';
 
     try {
-      const res = await fetch('/products/updateInventory', {
+      const res =  fetch('/products/updateInventory', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sku, inventory }) // ✅ send SKU instead of ID
       });
-
-      const data = await res.json();
+      console.log('Inventory update request sent for SKU:', sku, 'with inventory:', inventory);
+      console.log('Waiting for response...');
+      console.log('Response promise:', res);
+      const data = await res.then(r => r.json());
+      console.log('Inventory update response:', data);
       if (data.success) {
         alert('✅ Inventory updated successfully!');
       } else {

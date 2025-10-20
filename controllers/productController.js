@@ -362,7 +362,7 @@ exports.updateActive = (req, res) => {
 
 // ===================== UPDATE INVENTORY =====================
  // Update Inventory (calls external API, then updates DB)
- exports.updateInventory = async (req, res) => {
+  exports.updateInventory = async (req, res) => {
   const axios = require("axios");
   const { sku, inventory } = req.body;
 
@@ -370,64 +370,61 @@ exports.updateActive = (req, res) => {
     return res.status(400).json({ success: false, message: "SKU and inventory are required" });
   }
 
-  try {
-    // ✅ Fetch product info from DB using SKU
-    const sqlSelect = "SELECT sku, mpid FROM products WHERE sku = ?";
-    db.query(sqlSelect, [sku], async (err, results) => {
-      if (err || results.length === 0)
-        return res.status(404).json({ success: false, message: "Product not found" });
+  // 🔹 Fetch product info by SKU
+  const sqlSelect = "SELECT sku, mpid FROM products WHERE sku = ? LIMIT 1";
+  db.query(sqlSelect, [sku], async (err, results) => {
+    if (err || results.length === 0)
+      return res.status(404).json({ success: false, message: "Product not found" });
 
-      const product = results[0];
+    const product = results[0];
+console.log("Fetched product for inventory update:", product);
+    const payload = {
+      vpCode: product.sku,
+      mpid: product.mpid,
+      priceList: [],
+      fulfillmentPolicy: "stock",
+      pht: 1, // ✅ per latest client note (was 5)
+      inventory: parseInt(inventory, 10)
+    };
 
-      // ✅ Prepare API payload (fixed except inventory)
-      const payload = {
-        vpCode: product.sku,
-        mpid: product.mpid,
-        priceList: [],
-        fulfillmentPolicy: "stock",
-        pht: 1,
-        inventory: parseInt(inventory)
-      };
+    console.log("Sending inventory update payload:", payload);
 
-      console.log("📦 Sending inventory update payload:", payload);
+    try {
+      const response = await axios.post(
+        `https://raw.githubusercontent.com/freelancerking/net32/refs/heads/main/${product.sku}.json`,
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "Cache-Control": "no-cache",
+            "Subscription-Key": process.env.INVENTORY_SUBSCRIPTION_KEY || "YOUR_SUBSCRIPTION_KEY_HERE",
+          },
+          timeout: 5000
+        }
+      );
 
-      try {
-        // ✅ External API call
-        const response = await axios.post(
-          `https://raw.githubusercontent.com/freelancerking/net32/refs/heads/main/${product.sku}.json`,
-          payload,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              "Cache-Control": "no-cache",
-              "Subscription-Key": process.env.INVENTORY_SUBSCRIPTION_KEY || "YOUR_SUBSCRIPTION_KEY_HERE"
-            },
-            timeout: 5000
-          }
-        );
+   // const apiUrl = `https://raw.githubusercontent.com/freelancerking/net32/refs/heads/main/${product.sku}.json`; 
+   // const response = await axios.get(apiUrl, { responseType: "json" });
 
-        console.log("✅ API Response Status:", response.status);
+      console.log("✅ External API response:", response.status);
 
-        // ✅ Update DB (by SKU)
-        const sqlUpdate = "UPDATE products SET inventory = ?, last_update = NOW() WHERE sku = ?";
-        db.query(sqlUpdate, [inventory, sku], (err2) => {
-          if (err2) {
-            console.error("❌ DB update failed:", err2.message);
-            return res.status(500).json({ success: false, message: "DB update failed" });
-          }
+      // ✅ Update DB by SKU
+      const sqlUpdate = "UPDATE products SET inventory = ?, last_update = NOW() WHERE sku = ?";
+      db.query(sqlUpdate, [inventory, sku], (err2) => {
+        if (err2) {
+          console.error("❌ DB update failed:", err2.message);
+          return res.status(500).json({ success: false, message: "DB update failed" });
+        }
 
-          return res.json({ success: true, message: "Inventory updated successfully" });
-        });
-      } catch (apiErr) {
-        console.error("❌ External API error:", apiErr.message);
-        return res.status(500).json({ success: false, message: "External API call failed" });
-      }
-    });
-  } catch (err) {
-    console.error("❌ updateInventory error:", err.message);
-    return res.status(500).json({ success: false, message: err.message });
-  }
+        return res.json({ success: true, message: "Inventory updated successfully" });
+      });
+    } catch (apiErr) {
+      console.error("❌ External API error:", apiErr.message);
+      return res.status(500).json({ success: false, message: "External API call failed" });
+    }
+  });
 };
+
 // ===================== UPDATE INVENTORY ENDS =====================
 
 

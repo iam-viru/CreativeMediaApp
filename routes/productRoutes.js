@@ -18,7 +18,7 @@ router.post('/updateActive/:id', productController.updateActive);
 
 //router.post('/updateInventory', productController.updateInventory);
 // Update Inventory for a single product
-router.post('/updateInventory/:id', productController.updateInventory);
+router.post('/updateInventory', productController.updateInventory);
 
 
 
