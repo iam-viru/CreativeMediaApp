@@ -160,9 +160,10 @@
       </div>
 
       <div class="relative border rounded-lg bg-white shadow-sm">
-        <div id="table-scroll-container" class="overflow-auto max-h-[70vh]">
-        <table class="min-w-full border-collapse text-sm">
-          <thead class="bg-gray-100 sticky top-0 z-10">
+        <div id="table-scroll-container" class="overflow-auto max-h-[70vh] bg-white border-x border-gray-200">
+        <table class="min-w-full border-separate border-spacing-0 border border-gray-200 text-sm bg-white">
+
+          <thead class="bg-gray-100 sticky top-0 z-10 border-b border-gray-300">
             <tr>
               <th class="px-4 py-2 text-left"><input type="checkbox" id="selectAll" class="cursor-pointer"></th>
               <!-- ID removed -->
@@ -191,7 +192,9 @@
                   prevInventory=null; %>
 
                   <% products.forEach(p=> { %>
-                    <tr class="border-b hover:bg-gray-50" data-product-id="<%= p.id %>">
+                    <tr class="bg-white border-b border-gray-200 hover:bg-gray-50" data-product-id="<%= p.id %>">
+
+
                       <td class="px-4 py-2 text-center">
                         <input type="checkbox" name="selected[]" value="<%= p.id %>" class="selectRow cursor-pointer">
                       </td>
@@ -327,7 +330,7 @@
 
         </table>
         </div>  
-        <div id="scrollbar-proxy" class="sticky bottom-0 bg-gray-100 border-t border-gray-200 h-4 overflow-x-auto">
+        <div id="scrollbar-proxy" class="sticky bottom-0 bg-white border-t border-x border-gray-200 h-4 overflow-x-auto">
     <div class="w-[2000px]"></div>  
   </div>
       </div>
@@ -353,7 +356,7 @@
   <!-- Script section Starts-->
   <script>
 
-      const tableScroll = document.getElementById('table-scroll-container');
+  const tableScroll = document.getElementById('table-scroll-container');
   const proxy = document.getElementById('scrollbar-proxy');
   proxy.addEventListener('scroll', () => {
     tableScroll.scrollLeft = proxy.scrollLeft;
