@@ -278,7 +278,7 @@ exports.deleteProduct = (req, res) => {
      //change your url accordingly
 
      //for testing purpose 
-    const apiUrl = `https://raw.githubusercontent.com/freelancerking/net32/refs/heads/main/${vpCode}.json`;
+    //const apiUrl = `https://raw.githubusercontent.com/freelancerking/net32/refs/heads/main/${vpCode}.json`;
       // ✅ POST body (payload)
     const payload = {
       vpCode: vpCode,
@@ -296,8 +296,8 @@ exports.deleteProduct = (req, res) => {
     };
 
     //production purpose
-   //const apiUrl = `https://raw.githubusercontent.com/freelancerking/net32/refs/heads/main/${vpCode}.json`;
-  const response = await axios.post(apiUrl, payload, { headers });
+    const apiUrl = `https://raw.githubusercontent.com/freelancerking/net32/refs/heads/main/${vpCode}.json`;
+    const response = await axios.post(apiUrl, payload, { headers });
    //const response = await axios.get(apiUrl, { responseType: "json" });
 
     const result = response.data?.payload?.result?.[0];
@@ -316,7 +316,7 @@ exports.deleteProduct = (req, res) => {
         .map(p => ({
           qty: p.minQty,
           minPrice: 0,
-          interval: 12, // default hours
+          interval: 21, // default hours
         }));
 
     console.log("✅ Extracted from API:", { mpid, description, priceBreaks, active });
