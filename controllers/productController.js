@@ -315,7 +315,7 @@ exports.deleteProduct = (req, res) => {
         .slice(0, 5)
         .map(p => ({
           qty: p.minQty,
-          minPrice: p.price,
+          minPrice: 0,
           interval: 12, // default hours
         }));
 
@@ -459,7 +459,7 @@ console.log("Fetched product for inventory update:", product);
           headers: {
             "Content-Type": "application/json",
             "Cache-Control": "no-cache",
-            "Subscription-Key": process.env.INVENTORY_SUBSCRIPTION_KEY || "YOUR_SUBSCRIPTION_KEY_HERE"
+            "Subscription-Key": process.env.SUBSCRIPTION_KEY || "YOUR_SUBSCRIPTION_KEY_HERE"
           },
           timeout: 10000,
           responseType: "text"
