@@ -274,8 +274,7 @@ exports.deleteProduct = (req, res) => {
   if (!vpCode)
     return res.status(400).json({ success: false, message: "vpCode is required" });
 
-  try {
-     //change your url accordingly
+  try { 
 
      //for testing purpose 
     //const apiUrl = `https://raw.githubusercontent.com/freelancerking/net32/refs/heads/main/${vpCode}.json`;
@@ -297,8 +296,8 @@ exports.deleteProduct = (req, res) => {
 
     //production purpose
   const apiUrl = `https://raw.githubusercontent.com/freelancerking/net32/refs/heads/main/${vpCode}.json`;
-   //const response = await axios.post(apiUrl, payload, { headers });
-  const response = await axios.get(apiUrl, { responseType: "json" });
+  const response = await axios.post(apiUrl, payload, { headers });
+  //const response = await axios.get(apiUrl, { responseType: "json" });
 
     const result = response.data?.payload?.result?.[0];
     if (!result) {
@@ -428,7 +427,7 @@ console.log("Fetched product for inventory update:", product);
    exports.updateInventory = async (req, res) => {
   const axios = require("axios");
   const { sku, inventory } = req.body;
-
+console.log("incomming parameters :",sku,inventory);
   if (!sku || inventory == null) {
     return res.status(400).json({ success: false, message: "SKU and inventory are required" });
   }
@@ -449,8 +448,8 @@ console.log("Fetched product for inventory update:", product);
       inventory: parseInt(inventory, 10)
     };
 
-    console.log("📦 Sending Inventory Update Payload:", payload);
-console.log("calling the api:https://freelancerking.biz.id/update_inventory.php ");
+ console.log("Sending Inventory Update Payload:", payload);
+ console.log("calling the api:https://freelancerking.biz.id/update_inventory.php ");
     try {
       const response = await axios.post(
         "https://freelancerking.biz.id/update_inventory.php",

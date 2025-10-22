@@ -514,8 +514,7 @@
 
           spinner.classList.remove('hidden'); // show spinner
 
-          try {
-            // ✅ Call your backend route (no CORS issue)
+          try { 
             const res = await fetch('/products/fetchProduct', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -623,7 +622,7 @@
 
           if (res.ok && data.success) {
             showToast('Product(s) added successfully!', true);
-            // ✅ Call Update Inventory API automatically after successful add
+            // Call Update Inventory API automatically after successful add
             try {
               const invPayload = {
                 vpCode: sku,
@@ -635,20 +634,29 @@
               };
 
               console.log('Auto-calling Update Inventory API:', invPayload);
-
-              // call your backend route that triggers updateInventory
-              await fetch('/products/updateInventory', {
+ 
+              const res = fetch('/products/updateInventory', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(invPayload),
+                body: JSON.stringify({ sku, inventory }) // ✅ send SKU instead of ID
               });
+              console.log('Inventory update request sent for SKU:', sku, 'with inventory:', inventory);
+              console.log('Waiting for response...');
+              console.log('Response promise:', res);
+              const data = await res.then(r => r.json());
+              console.log('Inventory update response:', data);
+              if (data.success) {
+                alert('✅ Inventory updated successfully!');
+              } else {
+                alert('❌ ' + (data.message || 'Failed to update inventory.'));
+              }
             } catch (apiErr) {
               alert(apiErr);
               console.warn('Inventory update after add failed:', apiErr.message);
             }
 
             // finally reload the table 
-           //location.reload();
+            //location.reload();
           } else {
             alert(`⚠️ ${data.message || 'Server error while adding product.'}`);
           }
