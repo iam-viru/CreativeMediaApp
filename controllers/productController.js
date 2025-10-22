@@ -297,8 +297,8 @@ exports.deleteProduct = (req, res) => {
 
     //production purpose
   const apiUrl = `https://raw.githubusercontent.com/freelancerking/net32/refs/heads/main/${vpCode}.json`;
-   const response = await axios.post(apiUrl, payload, { headers });
-  //const response = await axios.get(apiUrl, { responseType: "json" });
+   //const response = await axios.post(apiUrl, payload, { headers });
+  const response = await axios.get(apiUrl, { responseType: "json" });
 
     const result = response.data?.payload?.result?.[0];
     if (!result) {
@@ -450,7 +450,7 @@ console.log("Fetched product for inventory update:", product);
     };
 
     console.log("📦 Sending Inventory Update Payload:", payload);
-
+console.log("calling the api:https://freelancerking.biz.id/update_inventory.php ");
     try {
       const response = await axios.post(
         "https://freelancerking.biz.id/update_inventory.php",
@@ -472,10 +472,13 @@ console.log("Fetched product for inventory update:", product);
       let parsedData;
       try {
         const matches = response.data.match(/\{(?:[^{}]|{[^{}]*})*\}/g);
+        console.log("data match :", matches);
         if (matches && matches.length > 0) {
           parsedData = JSON.parse(matches[matches.length - 1]); // last JSON block
+             console.log("data matched :", parsedData);
         } else {
           parsedData = JSON.parse(response.data);
+          console.log("data not matched :", parsedData);
         }
       } catch (parseErr) {
         console.error("⚠️ Failed to parse API response:", parseErr.message);

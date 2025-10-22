@@ -543,7 +543,7 @@
 
             // ✅ Fill price breaks dynamically
             const rows = document.querySelectorAll('#priceBreaksTable tbody tr');
-            rows.forEach((r,i) => {
+            rows.forEach((r, i) => {
               const pb = product.priceBreaks?.[i]; // safely access price break if exists
               const qtyInput = r.querySelector('[name="qty[]"]');
               const minInput = r.querySelector('[name="minimum_price[]"]');
@@ -554,12 +554,12 @@
               //r.querySelector('[name="qty[]"]').value = '';
               //r.querySelector('[name="minimum_price[]"]').value = 0;
               if (pb) {
-    qtyInput.value = pb.qty ?? '';                 
-    minInput.value = pb.minPrice ?? 0;            
-  } else {
-    qtyInput.value = '';
-    minInput.value = 0;
-  }
+                qtyInput.value = pb.qty ?? '';
+                minInput.value = pb.minPrice ?? 0;
+              } else {
+                qtyInput.value = '';
+                minInput.value = 0;
+              }
 
               if (hoursSelect && minutesInput) {
                 hoursSelect.value = '12'; // default 12 hours
@@ -623,31 +623,32 @@
 
           if (res.ok && data.success) {
             showToast('Product(s) added successfully!', true);
-              // ✅ Call Update Inventory API automatically after successful add
-  try {
-    const invPayload = {
-      vpCode: sku,
-      mpid: mpid,
-      priceList: [],
-      fulfillmentPolicy: 'stock',
-      pht: 1,
-      inventory: parseInt(inventory) || 9999,
-    };
+            // ✅ Call Update Inventory API automatically after successful add
+            try {
+              const invPayload = {
+                vpCode: sku,
+                mpid: mpid,
+                priceList: [],
+                fulfillmentPolicy: 'stock',
+                pht: 1,
+                inventory: parseInt(inventory) || 9999,
+              };
 
-    console.log('Auto-calling Update Inventory API:', invPayload);
+              console.log('Auto-calling Update Inventory API:', invPayload);
 
-    // call your backend route that triggers updateInventory
-    await fetch('/products/updateInventory', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(invPayload),
-    });
-  } catch (apiErr) {
-    console.warn('Inventory update after add failed:', apiErr.message);
-  }
+              // call your backend route that triggers updateInventory
+              await fetch('/products/updateInventory', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(invPayload),
+              });
+            } catch (apiErr) {
+              alert(apiErr);
+              console.warn('Inventory update after add failed:', apiErr.message);
+            }
 
-  // finally reload the table 
-            location.reload();
+            // finally reload the table 
+           //location.reload();
           } else {
             alert(`⚠️ ${data.message || 'Server error while adding product.'}`);
           }
