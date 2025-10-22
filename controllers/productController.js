@@ -298,7 +298,7 @@ exports.deleteProduct = (req, res) => {
     //production purpose
   const apiUrl = `https://raw.githubusercontent.com/freelancerking/net32/refs/heads/main/${vpCode}.json`;
    const response = await axios.post(apiUrl, payload, { headers });
-   //const response = await axios.get(apiUrl, { responseType: "json" });
+  //const response = await axios.get(apiUrl, { responseType: "json" });
 
     const result = response.data?.payload?.result?.[0];
     if (!result) {

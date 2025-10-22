@@ -622,7 +622,31 @@
           const data = await res.json();
 
           if (res.ok && data.success) {
-            showToast('✅ Product(s) added successfully!', true);
+            showToast('Product(s) added successfully!', true);
+              // ✅ Call Update Inventory API automatically after successful add
+  try {
+    const invPayload = {
+      vpCode: sku,
+      mpid: mpid,
+      priceList: [],
+      fulfillmentPolicy: 'stock',
+      pht: 1,
+      inventory: parseInt(inventory) || 9999,
+    };
+
+    console.log('Auto-calling Update Inventory API:', invPayload);
+
+    // call your backend route that triggers updateInventory
+    await fetch('/products/updateInventory', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(invPayload),
+    });
+  } catch (apiErr) {
+    console.warn('Inventory update after add failed:', apiErr.message);
+  }
+
+  // finally reload the table 
             location.reload();
           } else {
             alert(`⚠️ ${data.message || 'Server error while adding product.'}`);
