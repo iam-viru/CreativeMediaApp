@@ -673,19 +673,20 @@ document.getElementById("addProductBtn").addEventListener("click", async () => {
         const invPayload = { sku, inventory };
         log("📤 Calling /products/updateInventory", invPayload);
 
-        const res2 = await fetch("/products/updateInventory", {
+        const res2 =  fetch("/products/updateInventory", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(invPayload),
+          body: JSON.stringify({ sku, inventory }),
         });
 
-        const invData = await res2.json();
-        log("📥 /products/updateInventory response", invData);
+        //const invData = await res2.json();
+        const data = await res2.then(r => r.json());
+        log("📥 /products/updateInventory response", data);
 
-        if (invData.success) {
+        if (data.success) {
           alert("✅ Inventory updated successfully!");
         } else {
-          alert("❌ " + (invData.message || "Failed to update inventory."));
+          alert("❌ " + (data.message || "Failed to update inventory."));
         }
       } catch (apiErr) {
         log("❌ Inventory update failed", apiErr);
