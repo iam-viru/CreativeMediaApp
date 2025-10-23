@@ -579,92 +579,135 @@
 
 
       // === Add Product Starts === 
-      document.getElementById('addProductBtn').addEventListener('click', async () => {
-        const sku = document.getElementById('vpCode').value.trim();
-        const mpid = document.getElementById('mpid').value.trim();
-        const product_name = document.getElementById('product_name').value.trim();
-        const product_url = document.getElementById('product_url').value.trim();
-        const inventory = document.getElementById('inventory').value.trim();
-        //const active = document.getElementById('active').checked ? 1 : 0; // global product active flag
+      // --- helper logger -------------------------------------------------
+const logBuffer = [];
+function log(msg, data) {
+  const line = `[${new Date().toLocaleTimeString()}] ${msg}`;
+  console.log(line, data ?? "");
+  logBuffer.push(line + (data ? " " + JSON.stringify(data) : ""));
+}
 
-        const rows = [...document.querySelectorAll('#priceBreaksTable tbody tr')];
-        const priceBreaks = rows.map(r => {
-          const qty = r.querySelector('[name="qty[]"]').value;
-          const min = r.querySelector('[name="minimum_price[]"]').value;
-          const hours = parseInt(r.querySelector('[name="update_hours[]"]').value || '12', 10);
-          const minutes = parseInt(r.querySelector('[name="update_minutes[]"]').value || '0', 10);
-          const activeCd = r.querySelector('[name="activeCd[]"]').checked ? 1 : 0;
+// Optionally let user download logs if needed
+function downloadLogs() {
+  const blob = new Blob([logBuffer.join("\n")], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "add-product-log.txt";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+// -------------------------------------------------------------------
 
-          const safeMinutes = Math.min(Math.max(minutes, 0), 59);
-          const interval = (hours * 60) + safeMinutes;
+document.getElementById("addProductBtn").addEventListener("click", async () => {
+  const sku = document.getElementById("vpCode").value.trim();
+  const mpid = document.getElementById("mpid").value.trim();
+  const product_name = document.getElementById("product_name").value.trim();
+  const product_url = document.getElementById("product_url").value.trim();
+  const inventory = document.getElementById("inventory").value.trim();
 
-          return { qty, min, interval, activeCd };
-        }).filter(pb => pb.qty && pb.interval);
+  log("🟢 Add Product Clicked", { sku, mpid, product_name, inventory });
 
-        if (!sku || !mpid || !product_name || !product_url || !inventory) {
-          alert('All fields (MPID, Product Name, Product URL, Inventory) are required.');
-          return;
+  const rows = [...document.querySelectorAll("#priceBreaksTable tbody tr")];
+  const priceBreaks = rows
+    .map((r) => {
+      const qty = r.querySelector('[name="qty[]"]').value;
+      const min = r.querySelector('[name="minimum_price[]"]').value;
+      const hours = parseInt(
+        r.querySelector('[name="update_hours[]"]').value || "12",
+        10
+      );
+      const minutes = parseInt(
+        r.querySelector('[name="update_minutes[]"]').value || "0",
+        10
+      );
+      const activeCd = r.querySelector('[name="activeCd[]"]').checked ? 1 : 0;
+      const safeMinutes = Math.min(Math.max(minutes, 0), 59);
+      const interval = hours * 60 + safeMinutes;
+      return { qty, min, interval, activeCd };
+    })
+    .filter((pb) => pb.qty && pb.interval);
+
+  if (!sku || !mpid || !product_name || !product_url || !inventory) {
+    alert("All fields (MPID, Product Name, Product URL, Inventory) are required.");
+    log("⚠️ Missing required fields");
+    return;
+  }
+
+  if (priceBreaks.length === 0) {
+    alert("Please enter at least one price break.");
+    log("⚠️ No price breaks found");
+    return;
+  }
+
+  try {
+    log("📤 Sending /products/add payload", {
+      sku,
+      mpid,
+      product_name,
+      product_url,
+      inventory,
+      priceBreaks,
+    });
+    const res = await fetch("/products/add", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        sku,
+        mpid,
+        product_name,
+        product_url,
+        inventory,
+        priceBreaks,
+      }),
+    });
+
+    const data = await res.json();
+    log("📥 /products/add response", data);
+
+    if (res.ok && data.success) {
+      showToast("Product(s) added successfully!", true);
+
+      // Call Update Inventory API automatically
+      try {
+        const invPayload = { sku, inventory };
+        log("📤 Calling /products/updateInventory", invPayload);
+
+        const res2 = await fetch("/products/updateInventory", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(invPayload),
+        });
+
+        const invData = await res2.json();
+        log("📥 /products/updateInventory response", invData);
+
+        if (invData.success) {
+          alert("✅ Inventory updated successfully!");
+        } else {
+          alert("❌ " + (invData.message || "Failed to update inventory."));
         }
+      } catch (apiErr) {
+        log("❌ Inventory update failed", apiErr);
+        alert("Inventory update failed: " + apiErr.message);
+      }
+    } else {
+      log("⚠️ Add product server returned error", data);
+      alert(`⚠️ ${data.message || "Server error while adding product."}`);
+    }
+  } catch (err) {
+    log("❌ Add product fetch failed", err);
+    alert("⚠️ Unexpected error while adding product.");
+  } finally {
+    log("🟣 Add Product flow completed");
+    // Uncomment this if you want to auto-download logs each time
+   downloadLogs();
+  }
+});
 
-        if (priceBreaks.length === 0) {
-          alert('Please enter at least one price break.');
-          return;
-        }
+// Optionally expose download button for client
+window.downloadAddProductLogs = downloadLogs;
 
-        try {
-          const res = await fetch('/products/add', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ sku, mpid, product_name, product_url, inventory, priceBreaks })
-          });
-
-          const data = await res.json();
-
-          if (res.ok && data.success) {
-            showToast('Product(s) added successfully!', true);
-            // Call Update Inventory API automatically after successful add
-            try {
-              const invPayload = {
-                vpCode: sku,
-                mpid: mpid,
-                priceList: [],
-                fulfillmentPolicy: 'stock',
-                pht: 1,
-                inventory: parseInt(inventory) || 9999,
-              };
-
-              console.log('Auto-calling Update Inventory API:', invPayload);
- 
-              const res = fetch('/products/updateInventory', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ sku, inventory }) // ✅ send SKU instead of ID
-              });
-              console.log('Inventory update request sent for SKU:', sku, 'with inventory:', inventory);
-              console.log('Waiting for response...');
-              console.log('Response promise:', res);
-              const data = await res.then(r => r.json());
-              console.log('Inventory update response:', data);
-              if (data.success) {
-                alert('✅ Inventory updated successfully!');
-              } else {
-                alert('❌ ' + (data.message || 'Failed to update inventory.'));
-              }
-            } catch (apiErr) {
-              alert(apiErr);
-              console.warn('Inventory update after add failed:', apiErr.message);
-            }
-
-            // finally reload the table 
-            //location.reload();
-          } else {
-            alert(`⚠️ ${data.message || 'Server error while adding product.'}`);
-          }
-        } catch (err) {
-          console.error('Add product failed:', err);
-          alert('⚠️ Unexpected error while adding product.');
-        }
-      });
 
 
       // === Add Product Ends ===

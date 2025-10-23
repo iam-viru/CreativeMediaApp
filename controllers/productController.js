@@ -424,7 +424,7 @@ console.log("Fetched product for inventory update:", product);
   });
 };*/
 
-   exports.updateInventory = async (req, res) => {
+   /*exports.updateInventory = async (req, res) => {
   const axios = require("axios");
   const { sku, inventory } = req.body;
 console.log("incomming parameters :",sku,inventory);
@@ -521,7 +521,132 @@ console.log("incomming parameters :",sku,inventory);
         .json({ success: false, message: "External API call failed" });
     }
   });
+};*/
+
+const axios = require("axios");
+const logger = require("../utils/logger");
+
+exports.updateInventory = async (req, res) => {
+  logger.info("🟢 ===== Incoming /products/updateInventory Request =====");
+  logger.debug("Headers: " + JSON.stringify(req.headers, null, 2));
+  logger.debug("Body: " + JSON.stringify(req.body, null, 2));
+
+  const { sku, inventory } = req.body;
+  logger.info(`Incoming parameters → sku: ${sku}, inventory: ${inventory}`);
+
+  if (!sku || inventory == null) {
+    logger.warn("Missing required fields");
+    return res
+      .status(400)
+      .json({ success: false, message: "SKU and inventory are required" });
+  }
+
+  const sqlSelect = "SELECT sku, mpid FROM products WHERE sku = ? LIMIT 1";
+  db.query(sqlSelect, [sku], async (err, results) => {
+    if (err) {
+      logger.error("DB select error: " + err.message);
+      return res.status(500).json({ success: false, message: "DB error" });
+    }
+    if (results.length === 0) {
+      logger.warn(`Product not found for SKU ${sku}`);
+      return res
+        .status(404)
+        .json({ success: false, message: "Product not found" });
+    }
+
+    const product = results[0];
+    const payload = {
+      vpCode: product.sku,
+      mpid: product.mpid,
+      priceList: [],
+      fulfillmentPolicy: "stock",
+      pht: 1,
+      inventory: parseInt(inventory, 10),
+    };
+
+    logger.info("Sending Inventory Update Payload: " + JSON.stringify(payload));
+    logger.info("Calling API: https://freelancerking.biz.id/update_inventory.php");
+
+    try {
+      const response = await axios.post(
+        "https://freelancerking.biz.id/update_inventory.php",
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "Cache-Control": "no-cache",
+            "Subscription-Key":
+              process.env.SUBSCRIPTION_KEY || "YOUR_SUBSCRIPTION_KEY_HERE",
+          },
+          timeout: 10000,
+          responseType: "text",
+        }
+      );
+
+      logger.debug("Raw API Response: " + response.data);
+
+      // Extract the last valid JSON block
+      let parsedData;
+      try {
+        const matches = response.data.match(/\{(?:[^{}]|{[^{}]*})*\}/g);
+        logger.debug("Regex matches: " + JSON.stringify(matches));
+        if (matches && matches.length > 0) {
+          parsedData = JSON.parse(matches[matches.length - 1]);
+          logger.debug("Parsed JSON (matched): " + JSON.stringify(parsedData));
+        } else {
+          parsedData = JSON.parse(response.data);
+          logger.debug("Parsed JSON (direct): " + JSON.stringify(parsedData));
+        }
+      } catch (parseErr) {
+        logger.error("Parse error: " + parseErr.message);
+        logger.error("Raw snippet: " + response.data.slice(0, 300));
+        return res.status(500).json({
+          success: false,
+          message: "Invalid or malformed JSON returned by external API",
+        });
+      }
+
+      const isSuccessful =
+        parsedData.statusCode === 200 || parsedData.success === true;
+
+      if (isSuccessful) {
+        const sqlUpdate =
+          "UPDATE products SET inventory = ?, last_update = NOW() WHERE sku = ?";
+        db.query(sqlUpdate, [inventory, sku], (err2) => {
+          if (err2) {
+            logger.error("DB update failed: " + err2.message);
+            return res
+              .status(500)
+              .json({ success: false, message: "DB update failed" });
+          }
+
+          logger.info(`✅ Inventory updated in DB for SKU ${sku}`);
+          return res.json({
+            success: true,
+            message: "✅ Inventory updated successfully!",
+            apiResponse: parsedData,
+          });
+        });
+      } else {
+        logger.warn("Unexpected API response format: " + JSON.stringify(parsedData));
+        return res.status(500).json({
+          success: false,
+          message: "External API returned an unexpected format",
+        });
+      }
+    } catch (apiErr) {
+      logger.error("External API error: " + apiErr.message);
+      if (apiErr.response)
+        logger.error("API error body: " + JSON.stringify(apiErr.response.data));
+      return res
+        .status(500)
+        .json({ success: false, message: "External API call failed" });
+    } finally {
+      logger.info("🟣 ===== End /products/updateInventory Request =====\n");
+    }
+  });
 };
+
 
 
 
