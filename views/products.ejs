@@ -685,6 +685,7 @@ document.getElementById("addProductBtn").addEventListener("click", async () => {
 
         if (data.success) {
           alert("✅ Inventory updated successfully!");
+          location.reload();
         } else {
           alert("❌ " + (data.message || "Failed to update inventory."));
         }
