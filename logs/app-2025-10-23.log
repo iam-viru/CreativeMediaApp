@@ -1,0 +1,440 @@
+[2025-10-23 15:02:56] info: 🟢 ===== Incoming /products/updateInventory Request =====
+[2025-10-23 15:02:56] debug: Headers: {
+  "host": "localhost:3000",
+  "connection": "keep-alive",
+  "content-length": "32",
+  "sec-ch-ua-platform": "\"Windows\"",
+  "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+  "sec-ch-ua": "\"Google Chrome\";v=\"141\", \"Not?A_Brand\";v=\"8\", \"Chromium\";v=\"141\"",
+  "content-type": "application/json",
+  "sec-ch-ua-mobile": "?0",
+  "accept": "*/*",
+  "origin": "http://localhost:3000",
+  "sec-fetch-site": "same-origin",
+  "sec-fetch-mode": "cors",
+  "sec-fetch-dest": "empty",
+  "referer": "http://localhost:3000/products?page=2",
+  "accept-encoding": "gzip, deflate, br, zstd",
+  "accept-language": "en-US,en;q=0.9,fr;q=0.8",
+  "cookie": "ext_name=ojplmecpdpgccookcobabopnaifgidhf; connect.sid=s%3AH38ObLQYdvwaGz8V-Mqqi7eUkd3mg4re.8YYTSu0VLz612hYEyNWm9%2FHY%2FDEb%2FUTS0lkIfqOcEiM"
+}
+[2025-10-23 15:02:56] debug: Body: {
+  "sku": "EP03F",
+  "inventory": "22"
+}
+[2025-10-23 15:02:56] info: Incoming parameters → sku: EP03F, inventory: 22
+[2025-10-23 15:02:56] info: Sending Inventory Update Payload: {"vpCode":"EP03F","mpid":118102,"priceList":[],"fulfillmentPolicy":"stock","pht":1,"inventory":22}
+[2025-10-23 15:02:56] info: Calling API: https://freelancerking.biz.id/update_inventory.php
+[2025-10-23 15:02:58] debug: Raw API Response: {
+    "success": true,
+    "message": "POST data received successfully.",
+    "data": {
+        "vpCode": "EP03F",
+        "mpid": 118102,
+        "priceList": [],
+        "fulfillmentPolicy": "stock",
+        "pht": 1,
+        "inventory": 22
+    }
+}{"statusCode":200,"payload":{"mpid":118102,"vpCode":"EP03F","mpCode":"UC-EP03","fulfillmentPolicy":"Stock","inStock":true,"inventory":22,"pht":1,"priceList":[],"promoPriceList":[]},"message":"Update successful"}
+[2025-10-23 15:02:58] debug: Regex matches: ["{\n    \"success\": true,\n    \"message\": \"POST data received successfully.\",\n    \"data\": {\n        \"vpCode\": \"EP03F\",\n        \"mpid\": 118102,\n        \"priceList\": [],\n        \"fulfillmentPolicy\": \"stock\",\n        \"pht\": 1,\n        \"inventory\": 22\n    }\n}","{\"statusCode\":200,\"payload\":{\"mpid\":118102,\"vpCode\":\"EP03F\",\"mpCode\":\"UC-EP03\",\"fulfillmentPolicy\":\"Stock\",\"inStock\":true,\"inventory\":22,\"pht\":1,\"priceList\":[],\"promoPriceList\":[]},\"message\":\"Update successful\"}"]
+[2025-10-23 15:02:58] debug: Parsed JSON (matched): {"statusCode":200,"payload":{"mpid":118102,"vpCode":"EP03F","mpCode":"UC-EP03","fulfillmentPolicy":"Stock","inStock":true,"inventory":22,"pht":1,"priceList":[],"promoPriceList":[]},"message":"Update successful"}
+[2025-10-23 15:02:58] info: 🟣 ===== End /products/updateInventory Request =====
+
+[2025-10-23 15:02:58] info: ✅ Inventory updated in DB for SKU EP03F
+[2025-10-23 15:07:25] info: 🟢 ===== Incoming /products/updateInventory Request =====
+[2025-10-23 15:07:25] debug: Headers: {
+  "host": "localhost:3000",
+  "connection": "keep-alive",
+  "content-length": "35",
+  "sec-ch-ua-platform": "\"Windows\"",
+  "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+  "sec-ch-ua": "\"Google Chrome\";v=\"141\", \"Not?A_Brand\";v=\"8\", \"Chromium\";v=\"141\"",
+  "content-type": "application/json",
+  "sec-ch-ua-mobile": "?0",
+  "accept": "*/*",
+  "origin": "http://localhost:3000",
+  "sec-fetch-site": "same-origin",
+  "sec-fetch-mode": "cors",
+  "sec-fetch-dest": "empty",
+  "referer": "http://localhost:3000/products",
+  "accept-encoding": "gzip, deflate, br, zstd",
+  "accept-language": "en-US,en;q=0.9,fr;q=0.8",
+  "cookie": "ext_name=ojplmecpdpgccookcobabopnaifgidhf; connect.sid=s%3AI4gFMcxm5vS1wlHWU4w3QcpWbBIzA0ZY.6J1bKUyHoEqWv0ZQdTh641vx6G1u%2Bz2Byo%2BggbmBTEQ"
+}
+[2025-10-23 15:07:25] debug: Body: {
+  "sku": "SKU012",
+  "inventory": "1111"
+}
+[2025-10-23 15:07:25] info: Incoming parameters → sku: SKU012, inventory: 1111
+[2025-10-23 15:07:25] info: Sending Inventory Update Payload: {"vpCode":"SKU012","mpid":122,"priceList":[],"fulfillmentPolicy":"stock","pht":1,"inventory":1111}
+[2025-10-23 15:07:25] info: Calling API: https://freelancerking.biz.id/update_inventory.php
+[2025-10-23 15:07:27] debug: Raw API Response: {
+    "success": true,
+    "message": "POST data received successfully.",
+    "data": {
+        "vpCode": "SKU012",
+        "mpid": 122,
+        "priceList": [],
+        "fulfillmentPolicy": "stock",
+        "pht": 1,
+        "inventory": 1111
+    }
+}{"statusCode":404,"payload":null,"message":"vpCode or mpid not found."}
+[2025-10-23 15:07:27] debug: Regex matches: ["{\n    \"success\": true,\n    \"message\": \"POST data received successfully.\",\n    \"data\": {\n        \"vpCode\": \"SKU012\",\n        \"mpid\": 122,\n        \"priceList\": [],\n        \"fulfillmentPolicy\": \"stock\",\n        \"pht\": 1,\n        \"inventory\": 1111\n    }\n}","{\"statusCode\":404,\"payload\":null,\"message\":\"vpCode or mpid not found.\"}"]
+[2025-10-23 15:07:27] debug: Parsed JSON (matched): {"statusCode":404,"payload":null,"message":"vpCode or mpid not found."}
+[2025-10-23 15:07:27] warn: Unexpected API response format: {"statusCode":404,"payload":null,"message":"vpCode or mpid not found."}
+[2025-10-23 15:07:27] info: 🟣 ===== End /products/updateInventory Request =====
+
+[2025-10-23 15:12:27] info: 🟢 ===== Incoming /products/updateInventory Request =====
+[2025-10-23 15:12:27] debug: Headers: {
+  "host": "localhost:3000",
+  "connection": "keep-alive",
+  "content-length": "36",
+  "sec-ch-ua-platform": "\"Windows\"",
+  "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+  "sec-ch-ua": "\"Google Chrome\";v=\"141\", \"Not?A_Brand\";v=\"8\", \"Chromium\";v=\"141\"",
+  "content-type": "application/json",
+  "sec-ch-ua-mobile": "?0",
+  "accept": "*/*",
+  "origin": "http://localhost:3000",
+  "sec-fetch-site": "same-origin",
+  "sec-fetch-mode": "cors",
+  "sec-fetch-dest": "empty",
+  "referer": "http://localhost:3000/products",
+  "accept-encoding": "gzip, deflate, br, zstd",
+  "accept-language": "en-US,en;q=0.9,fr;q=0.8",
+  "cookie": "ext_name=ojplmecpdpgccookcobabopnaifgidhf; connect.sid=s%3ARNdcvAOWUK7DDWVFaYGXTuSbelY8Q7FZ.dzSe%2BgGiSY44OpLYaFeTInCNtAYmAadAeFbhv5YmK2Q"
+}
+[2025-10-23 15:12:27] debug: Body: {
+  "sku": "EP04A-H11",
+  "inventory": "11"
+}
+[2025-10-23 15:12:27] info: Incoming parameters → sku: EP04A-H11, inventory: 11
+[2025-10-23 15:12:27] info: Sending Inventory Update Payload: {"vpCode":"EP04A-H11","mpid":221,"priceList":[],"fulfillmentPolicy":"stock","pht":1,"inventory":11}
+[2025-10-23 15:12:27] info: Calling API: https://freelancerking.biz.id/update_inventory.php
+[2025-10-23 15:12:28] debug: Raw API Response: {
+    "success": true,
+    "message": "POST data received successfully.",
+    "data": {
+        "vpCode": "EP04A-H11",
+        "mpid": 221,
+        "priceList": [],
+        "fulfillmentPolicy": "stock",
+        "pht": 1,
+        "inventory": 11
+    }
+}{"statusCode":404,"payload":null,"message":"vpCode or mpid not found."}
+[2025-10-23 15:12:28] debug: Regex matches: ["{\n    \"success\": true,\n    \"message\": \"POST data received successfully.\",\n    \"data\": {\n        \"vpCode\": \"EP04A-H11\",\n        \"mpid\": 221,\n        \"priceList\": [],\n        \"fulfillmentPolicy\": \"stock\",\n        \"pht\": 1,\n        \"inventory\": 11\n    }\n}","{\"statusCode\":404,\"payload\":null,\"message\":\"vpCode or mpid not found.\"}"]
+[2025-10-23 15:12:28] debug: Parsed JSON (matched): {"statusCode":404,"payload":null,"message":"vpCode or mpid not found."}
+[2025-10-23 15:12:28] warn: Unexpected API response format: {"statusCode":404,"payload":null,"message":"vpCode or mpid not found."}
+[2025-10-23 15:12:28] info: 🟣 ===== End /products/updateInventory Request =====
+
+[2025-10-23 19:54:12] info: 🟢 ===== Incoming /products/updateInventory Request =====
+[2025-10-23 19:54:12] debug: Headers: {
+  "host": "localhost:3000",
+  "connection": "keep-alive",
+  "content-length": "33",
+  "sec-ch-ua-platform": "\"Windows\"",
+  "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+  "sec-ch-ua": "\"Google Chrome\";v=\"141\", \"Not?A_Brand\";v=\"8\", \"Chromium\";v=\"141\"",
+  "content-type": "application/json",
+  "sec-ch-ua-mobile": "?0",
+  "accept": "*/*",
+  "origin": "http://localhost:3000",
+  "sec-fetch-site": "same-origin",
+  "sec-fetch-mode": "cors",
+  "sec-fetch-dest": "empty",
+  "referer": "http://localhost:3000/products",
+  "accept-encoding": "gzip, deflate, br, zstd",
+  "accept-language": "en-US,en;q=0.9,fr;q=0.8",
+  "cookie": "ext_name=ojplmecpdpgccookcobabopnaifgidhf; connect.sid=s%3AHP4ugPaAD9W5G6YE4A4RWbSLNdJHqK5u.6fuVhW89HliBSqplw9FQJxjme4yFhkpaS630IkEiKDM"
+}
+[2025-10-23 19:54:12] debug: Body: {
+  "sku": "EP03F",
+  "inventory": "123"
+}
+[2025-10-23 19:54:12] info: Incoming parameters → sku: EP03F, inventory: 123
+[2025-10-23 19:54:12] info: Sending Inventory Update Payload: {"vpCode":"EP03F","mpid":123,"priceList":[],"fulfillmentPolicy":"stock","pht":1,"inventory":123}
+[2025-10-23 19:54:12] info: Calling API: https://freelancerking.biz.id/update_inventory.php
+[2025-10-23 19:54:14] debug: Raw API Response: {
+    "success": true,
+    "message": "POST data received successfully.",
+    "data": {
+        "vpCode": "EP03F",
+        "mpid": 123,
+        "priceList": [],
+        "fulfillmentPolicy": "stock",
+        "pht": 1,
+        "inventory": 123
+    }
+}{"statusCode":404,"payload":null,"message":"vpCode or mpid not found."}
+[2025-10-23 19:54:14] debug: Regex matches: ["{\n    \"success\": true,\n    \"message\": \"POST data received successfully.\",\n    \"data\": {\n        \"vpCode\": \"EP03F\",\n        \"mpid\": 123,\n        \"priceList\": [],\n        \"fulfillmentPolicy\": \"stock\",\n        \"pht\": 1,\n        \"inventory\": 123\n    }\n}","{\"statusCode\":404,\"payload\":null,\"message\":\"vpCode or mpid not found.\"}"]
+[2025-10-23 19:54:14] debug: Parsed JSON (matched): {"statusCode":404,"payload":null,"message":"vpCode or mpid not found."}
+[2025-10-23 19:54:14] warn: Unexpected API response format: {"statusCode":404,"payload":null,"message":"vpCode or mpid not found."}
+[2025-10-23 19:54:14] info: 🟣 ===== End /products/updateInventory Request =====
+
+[2025-10-23 20:14:44] info: 🟢 ===== Incoming /products/updateInventory Request =====
+[2025-10-23 20:14:44] debug: Headers: {
+  "host": "localhost:3000",
+  "connection": "keep-alive",
+  "content-length": "32",
+  "sec-ch-ua-platform": "\"Windows\"",
+  "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+  "sec-ch-ua": "\"Google Chrome\";v=\"141\", \"Not?A_Brand\";v=\"8\", \"Chromium\";v=\"141\"",
+  "content-type": "application/json",
+  "sec-ch-ua-mobile": "?0",
+  "accept": "*/*",
+  "origin": "http://localhost:3000",
+  "sec-fetch-site": "same-origin",
+  "sec-fetch-mode": "cors",
+  "sec-fetch-dest": "empty",
+  "referer": "http://localhost:3000/products",
+  "accept-encoding": "gzip, deflate, br, zstd",
+  "accept-language": "en-US,en;q=0.9,fr;q=0.8",
+  "cookie": "ext_name=ojplmecpdpgccookcobabopnaifgidhf; connect.sid=s%3A3AoTmMg_By6tzIfXWlJ6UdiINYP-XxW-.LC7DM3P89qW4PIht7qX8tUYI%2BOivNC4eS8xHfcmwRV4"
+}
+[2025-10-23 20:14:44] debug: Body: {
+  "sku": "EP03F",
+  "inventory": "20"
+}
+[2025-10-23 20:14:44] info: Incoming parameters → sku: EP03F, inventory: 20
+[2025-10-23 20:14:44] info: Sending Inventory Update Payload: {"vpCode":"EP03F","mpid":123,"priceList":[],"fulfillmentPolicy":"stock","pht":1,"inventory":20}
+[2025-10-23 20:14:44] info: Calling API: https://freelancerking.biz.id/update_inventory.php
+[2025-10-23 20:14:46] debug: Raw API Response: {
+    "success": true,
+    "message": "POST data received successfully.",
+    "data": {
+        "vpCode": "EP03F",
+        "mpid": 123,
+        "priceList": [],
+        "fulfillmentPolicy": "stock",
+        "pht": 1,
+        "inventory": 20
+    }
+}{"statusCode":404,"payload":null,"message":"vpCode or mpid not found."}
+[2025-10-23 20:14:46] debug: Regex matches: ["{\n    \"success\": true,\n    \"message\": \"POST data received successfully.\",\n    \"data\": {\n        \"vpCode\": \"EP03F\",\n        \"mpid\": 123,\n        \"priceList\": [],\n        \"fulfillmentPolicy\": \"stock\",\n        \"pht\": 1,\n        \"inventory\": 20\n    }\n}","{\"statusCode\":404,\"payload\":null,\"message\":\"vpCode or mpid not found.\"}"]
+[2025-10-23 20:14:46] debug: Parsed JSON (matched): {"statusCode":404,"payload":null,"message":"vpCode or mpid not found."}
+[2025-10-23 20:14:46] warn: Unexpected API response format: {"statusCode":404,"payload":null,"message":"vpCode or mpid not found."}
+[2025-10-23 20:14:46] info: 🟣 ===== End /products/updateInventory Request =====
+
+[2025-10-23 20:15:21] info: 🟢 ===== Incoming /products/updateInventory Request =====
+[2025-10-23 20:15:21] debug: Headers: {
+  "host": "localhost:3000",
+  "connection": "keep-alive",
+  "content-length": "32",
+  "sec-ch-ua-platform": "\"Windows\"",
+  "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+  "sec-ch-ua": "\"Google Chrome\";v=\"141\", \"Not?A_Brand\";v=\"8\", \"Chromium\";v=\"141\"",
+  "content-type": "application/json",
+  "sec-ch-ua-mobile": "?0",
+  "accept": "*/*",
+  "origin": "http://localhost:3000",
+  "sec-fetch-site": "same-origin",
+  "sec-fetch-mode": "cors",
+  "sec-fetch-dest": "empty",
+  "referer": "http://localhost:3000/products",
+  "accept-encoding": "gzip, deflate, br, zstd",
+  "accept-language": "en-US,en;q=0.9,fr;q=0.8",
+  "cookie": "ext_name=ojplmecpdpgccookcobabopnaifgidhf; connect.sid=s%3A3AoTmMg_By6tzIfXWlJ6UdiINYP-XxW-.LC7DM3P89qW4PIht7qX8tUYI%2BOivNC4eS8xHfcmwRV4"
+}
+[2025-10-23 20:15:21] debug: Body: {
+  "sku": "EP03F",
+  "inventory": "20"
+}
+[2025-10-23 20:15:21] info: Incoming parameters → sku: EP03F, inventory: 20
+[2025-10-23 20:15:21] info: Sending Inventory Update Payload: {"vpCode":"EP03F","mpid":118102,"priceList":[],"fulfillmentPolicy":"stock","pht":1,"inventory":20}
+[2025-10-23 20:15:21] info: Calling API: https://freelancerking.biz.id/update_inventory.php
+[2025-10-23 20:15:24] debug: Raw API Response: {
+    "success": true,
+    "message": "POST data received successfully.",
+    "data": {
+        "vpCode": "EP03F",
+        "mpid": 118102,
+        "priceList": [],
+        "fulfillmentPolicy": "stock",
+        "pht": 1,
+        "inventory": 20
+    }
+}{"statusCode":200,"payload":{"mpid":118102,"vpCode":"EP03F","mpCode":"UC-EP03","fulfillmentPolicy":"Stock","inStock":true,"inventory":20,"pht":1,"priceList":[],"promoPriceList":[]},"message":"Update successful"}
+[2025-10-23 20:15:24] debug: Regex matches: ["{\n    \"success\": true,\n    \"message\": \"POST data received successfully.\",\n    \"data\": {\n        \"vpCode\": \"EP03F\",\n        \"mpid\": 118102,\n        \"priceList\": [],\n        \"fulfillmentPolicy\": \"stock\",\n        \"pht\": 1,\n        \"inventory\": 20\n    }\n}","{\"statusCode\":200,\"payload\":{\"mpid\":118102,\"vpCode\":\"EP03F\",\"mpCode\":\"UC-EP03\",\"fulfillmentPolicy\":\"Stock\",\"inStock\":true,\"inventory\":20,\"pht\":1,\"priceList\":[],\"promoPriceList\":[]},\"message\":\"Update successful\"}"]
+[2025-10-23 20:15:24] debug: Parsed JSON (matched): {"statusCode":200,"payload":{"mpid":118102,"vpCode":"EP03F","mpCode":"UC-EP03","fulfillmentPolicy":"Stock","inStock":true,"inventory":20,"pht":1,"priceList":[],"promoPriceList":[]},"message":"Update successful"}
+[2025-10-23 20:15:24] info: 🟣 ===== End /products/updateInventory Request =====
+
+[2025-10-23 20:15:24] info: ✅ Inventory updated in DB for SKU EP03F
+[2025-10-23 20:16:52] info: 🟢 ===== Incoming /products/updateInventory Request =====
+[2025-10-23 20:16:52] debug: Headers: {
+  "host": "localhost:3000",
+  "connection": "keep-alive",
+  "content-length": "32",
+  "sec-ch-ua-platform": "\"Windows\"",
+  "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+  "sec-ch-ua": "\"Google Chrome\";v=\"141\", \"Not?A_Brand\";v=\"8\", \"Chromium\";v=\"141\"",
+  "content-type": "application/json",
+  "sec-ch-ua-mobile": "?0",
+  "accept": "*/*",
+  "origin": "http://localhost:3000",
+  "sec-fetch-site": "same-origin",
+  "sec-fetch-mode": "cors",
+  "sec-fetch-dest": "empty",
+  "referer": "http://localhost:3000/products?page=3",
+  "accept-encoding": "gzip, deflate, br, zstd",
+  "accept-language": "en-US,en;q=0.9,fr;q=0.8",
+  "cookie": "ext_name=ojplmecpdpgccookcobabopnaifgidhf; connect.sid=s%3A3AoTmMg_By6tzIfXWlJ6UdiINYP-XxW-.LC7DM3P89qW4PIht7qX8tUYI%2BOivNC4eS8xHfcmwRV4"
+}
+[2025-10-23 20:16:52] debug: Body: {
+  "sku": "EP03F",
+  "inventory": "21"
+}
+[2025-10-23 20:16:52] info: Incoming parameters → sku: EP03F, inventory: 21
+[2025-10-23 20:16:52] info: Sending Inventory Update Payload: {"vpCode":"EP03F","mpid":118102,"priceList":[],"fulfillmentPolicy":"stock","pht":1,"inventory":21}
+[2025-10-23 20:16:52] info: Calling API: https://freelancerking.biz.id/update_inventory.php
+[2025-10-23 20:16:54] debug: Raw API Response: {
+    "success": true,
+    "message": "POST data received successfully.",
+    "data": {
+        "vpCode": "EP03F",
+        "mpid": 118102,
+        "priceList": [],
+        "fulfillmentPolicy": "stock",
+        "pht": 1,
+        "inventory": 21
+    }
+}{"statusCode":200,"payload":{"mpid":118102,"vpCode":"EP03F","mpCode":"UC-EP03","fulfillmentPolicy":"Stock","inStock":true,"inventory":21,"pht":1,"priceList":[],"promoPriceList":[]},"message":"Update successful"}
+[2025-10-23 20:16:54] debug: Regex matches: ["{\n    \"success\": true,\n    \"message\": \"POST data received successfully.\",\n    \"data\": {\n        \"vpCode\": \"EP03F\",\n        \"mpid\": 118102,\n        \"priceList\": [],\n        \"fulfillmentPolicy\": \"stock\",\n        \"pht\": 1,\n        \"inventory\": 21\n    }\n}","{\"statusCode\":200,\"payload\":{\"mpid\":118102,\"vpCode\":\"EP03F\",\"mpCode\":\"UC-EP03\",\"fulfillmentPolicy\":\"Stock\",\"inStock\":true,\"inventory\":21,\"pht\":1,\"priceList\":[],\"promoPriceList\":[]},\"message\":\"Update successful\"}"]
+[2025-10-23 20:16:54] debug: Parsed JSON (matched): {"statusCode":200,"payload":{"mpid":118102,"vpCode":"EP03F","mpCode":"UC-EP03","fulfillmentPolicy":"Stock","inStock":true,"inventory":21,"pht":1,"priceList":[],"promoPriceList":[]},"message":"Update successful"}
+[2025-10-23 20:16:54] info: 🟣 ===== End /products/updateInventory Request =====
+
+[2025-10-23 20:16:54] info: ✅ Inventory updated in DB for SKU EP03F
+[2025-10-23 20:33:31] info: 🟢 ===== Incoming /products/updateInventory Request =====
+[2025-10-23 20:33:31] debug: Headers: {
+  "host": "localhost:3000",
+  "connection": "keep-alive",
+  "content-length": "32",
+  "sec-ch-ua-platform": "\"Windows\"",
+  "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+  "sec-ch-ua": "\"Google Chrome\";v=\"141\", \"Not?A_Brand\";v=\"8\", \"Chromium\";v=\"141\"",
+  "content-type": "application/json",
+  "sec-ch-ua-mobile": "?0",
+  "accept": "*/*",
+  "origin": "http://localhost:3000",
+  "sec-fetch-site": "same-origin",
+  "sec-fetch-mode": "cors",
+  "sec-fetch-dest": "empty",
+  "referer": "http://localhost:3000/products",
+  "accept-encoding": "gzip, deflate, br, zstd",
+  "accept-language": "en-US,en;q=0.9,fr;q=0.8",
+  "cookie": "ext_name=ojplmecpdpgccookcobabopnaifgidhf; connect.sid=s%3AX3QJWQqO6tRe1tvOKPWZICCO1aOLuHNm.bkrImrqxpgCHj6ey9eyVWCed9U%2BeE1pkMAUiB08DPZw"
+}
+[2025-10-23 20:33:31] debug: Body: {
+  "sku": "EP03F",
+  "inventory": "20"
+}
+[2025-10-23 20:33:31] info: Incoming parameters → sku: EP03F, inventory: 20
+[2025-10-23 20:33:31] info: Sending Inventory Update Payload: {"vpCode":"EP03F","mpid":118102,"priceList":[],"fulfillmentPolicy":"stock","pht":1,"inventory":20}
+[2025-10-23 20:33:31] info: Calling API: https://freelancerking.biz.id/update_inventory.php
+[2025-10-23 20:33:33] debug: Raw API Response: {
+    "success": true,
+    "message": "POST data received successfully.",
+    "data": {
+        "vpCode": "EP03F",
+        "mpid": 118102,
+        "priceList": [],
+        "fulfillmentPolicy": "stock",
+        "pht": 1,
+        "inventory": 20
+    }
+}{"statusCode":200,"payload":{"mpid":118102,"vpCode":"EP03F","mpCode":"UC-EP03","fulfillmentPolicy":"Stock","inStock":true,"inventory":20,"pht":1,"priceList":[],"promoPriceList":[]},"message":"Update successful"}
+[2025-10-23 20:33:33] debug: Regex matches: ["{\n    \"success\": true,\n    \"message\": \"POST data received successfully.\",\n    \"data\": {\n        \"vpCode\": \"EP03F\",\n        \"mpid\": 118102,\n        \"priceList\": [],\n        \"fulfillmentPolicy\": \"stock\",\n        \"pht\": 1,\n        \"inventory\": 20\n    }\n}","{\"statusCode\":200,\"payload\":{\"mpid\":118102,\"vpCode\":\"EP03F\",\"mpCode\":\"UC-EP03\",\"fulfillmentPolicy\":\"Stock\",\"inStock\":true,\"inventory\":20,\"pht\":1,\"priceList\":[],\"promoPriceList\":[]},\"message\":\"Update successful\"}"]
+[2025-10-23 20:33:33] debug: Parsed JSON (matched): {"statusCode":200,"payload":{"mpid":118102,"vpCode":"EP03F","mpCode":"UC-EP03","fulfillmentPolicy":"Stock","inStock":true,"inventory":20,"pht":1,"priceList":[],"promoPriceList":[]},"message":"Update successful"}
+[2025-10-23 20:33:33] info: 🟣 ===== End /products/updateInventory Request =====
+
+[2025-10-23 20:33:33] info: ✅ Inventory updated in DB for SKU EP03F
+[2025-10-23 23:33:57] info: 🟢 ===== Incoming /products/updateInventory Request =====
+[2025-10-23 23:33:57] debug: Headers: {
+  "host": "localhost:3000",
+  "connection": "keep-alive",
+  "content-length": "32",
+  "sec-ch-ua-platform": "\"Windows\"",
+  "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+  "sec-ch-ua": "\"Google Chrome\";v=\"141\", \"Not?A_Brand\";v=\"8\", \"Chromium\";v=\"141\"",
+  "content-type": "application/json",
+  "sec-ch-ua-mobile": "?0",
+  "accept": "*/*",
+  "origin": "http://localhost:3000",
+  "sec-fetch-site": "same-origin",
+  "sec-fetch-mode": "cors",
+  "sec-fetch-dest": "empty",
+  "referer": "http://localhost:3000/products",
+  "accept-encoding": "gzip, deflate, br, zstd",
+  "accept-language": "en-US,en;q=0.9,fr;q=0.8",
+  "cookie": "ext_name=ojplmecpdpgccookcobabopnaifgidhf; connect.sid=s%3A63VQz5XStqm34qQiK9Fs5KQikyM7kZ7d.uki4WuQ0tgAjpD3GzYAA51eSc1DP90nWCJwG1lxsms8"
+}
+[2025-10-23 23:33:57] debug: Body: {
+  "sku": "EP03F",
+  "inventory": "20"
+}
+[2025-10-23 23:33:57] info: Incoming parameters → sku: EP03F, inventory: 20
+[2025-10-23 23:33:57] info: Sending Inventory Update Payload: {"vpCode":"EP03F","mpid":118102,"priceList":[],"fulfillmentPolicy":"stock","pht":1,"inventory":20}
+[2025-10-23 23:33:57] info: Calling API: https://freelancerking.biz.id/update_inventory.php
+[2025-10-23 23:33:58] debug: Raw API Response: {
+    "success": true,
+    "message": "POST data received successfully.",
+    "data": {
+        "vpCode": "EP03F",
+        "mpid": 118102,
+        "priceList": [],
+        "fulfillmentPolicy": "stock",
+        "pht": 1,
+        "inventory": 20
+    }
+}{"statusCode":200,"payload":{"mpid":118102,"vpCode":"EP03F","mpCode":"UC-EP03","fulfillmentPolicy":"Stock","inStock":true,"inventory":20,"pht":1,"priceList":[],"promoPriceList":[]},"message":"Update successful"}
+[2025-10-23 23:33:58] debug: Regex matches: ["{\n    \"success\": true,\n    \"message\": \"POST data received successfully.\",\n    \"data\": {\n        \"vpCode\": \"EP03F\",\n        \"mpid\": 118102,\n        \"priceList\": [],\n        \"fulfillmentPolicy\": \"stock\",\n        \"pht\": 1,\n        \"inventory\": 20\n    }\n}","{\"statusCode\":200,\"payload\":{\"mpid\":118102,\"vpCode\":\"EP03F\",\"mpCode\":\"UC-EP03\",\"fulfillmentPolicy\":\"Stock\",\"inStock\":true,\"inventory\":20,\"pht\":1,\"priceList\":[],\"promoPriceList\":[]},\"message\":\"Update successful\"}"]
+[2025-10-23 23:33:58] debug: Parsed JSON (matched): {"statusCode":200,"payload":{"mpid":118102,"vpCode":"EP03F","mpCode":"UC-EP03","fulfillmentPolicy":"Stock","inStock":true,"inventory":20,"pht":1,"priceList":[],"promoPriceList":[]},"message":"Update successful"}
+[2025-10-23 23:33:58] info: 🟣 ===== End /products/updateInventory Request =====
+
+[2025-10-23 23:33:58] info: ✅ Inventory updated in DB for SKU EP03F
+[2025-10-23 23:34:38] info: 🟢 ===== Incoming /products/updateInventory Request =====
+[2025-10-23 23:34:38] debug: Headers: {
+  "host": "localhost:3000",
+  "connection": "keep-alive",
+  "content-length": "32",
+  "sec-ch-ua-platform": "\"Windows\"",
+  "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+  "sec-ch-ua": "\"Google Chrome\";v=\"141\", \"Not?A_Brand\";v=\"8\", \"Chromium\";v=\"141\"",
+  "content-type": "application/json",
+  "sec-ch-ua-mobile": "?0",
+  "accept": "*/*",
+  "origin": "http://localhost:3000",
+  "sec-fetch-site": "same-origin",
+  "sec-fetch-mode": "cors",
+  "sec-fetch-dest": "empty",
+  "referer": "http://localhost:3000/products?page=3",
+  "accept-encoding": "gzip, deflate, br, zstd",
+  "accept-language": "en-US,en;q=0.9,fr;q=0.8",
+  "cookie": "ext_name=ojplmecpdpgccookcobabopnaifgidhf; connect.sid=s%3A63VQz5XStqm34qQiK9Fs5KQikyM7kZ7d.uki4WuQ0tgAjpD3GzYAA51eSc1DP90nWCJwG1lxsms8"
+}
+[2025-10-23 23:34:38] debug: Body: {
+  "sku": "EP03F",
+  "inventory": "23"
+}
+[2025-10-23 23:34:38] info: Incoming parameters → sku: EP03F, inventory: 23
+[2025-10-23 23:34:38] info: Sending Inventory Update Payload: {"vpCode":"EP03F","mpid":118102,"priceList":[],"fulfillmentPolicy":"stock","pht":1,"inventory":23}
+[2025-10-23 23:34:38] info: Calling API: https://freelancerking.biz.id/update_inventory.php
+[2025-10-23 23:34:39] debug: Raw API Response: {
+    "success": true,
+    "message": "POST data received successfully.",
+    "data": {
+        "vpCode": "EP03F",
+        "mpid": 118102,
+        "priceList": [],
+        "fulfillmentPolicy": "stock",
+        "pht": 1,
+        "inventory": 23
+    }
+}{"statusCode":200,"payload":{"mpid":118102,"vpCode":"EP03F","mpCode":"UC-EP03","fulfillmentPolicy":"Stock","inStock":true,"inventory":23,"pht":1,"priceList":[],"promoPriceList":[]},"message":"Update successful"}
+[2025-10-23 23:34:39] debug: Regex matches: ["{\n    \"success\": true,\n    \"message\": \"POST data received successfully.\",\n    \"data\": {\n        \"vpCode\": \"EP03F\",\n        \"mpid\": 118102,\n        \"priceList\": [],\n        \"fulfillmentPolicy\": \"stock\",\n        \"pht\": 1,\n        \"inventory\": 23\n    }\n}","{\"statusCode\":200,\"payload\":{\"mpid\":118102,\"vpCode\":\"EP03F\",\"mpCode\":\"UC-EP03\",\"fulfillmentPolicy\":\"Stock\",\"inStock\":true,\"inventory\":23,\"pht\":1,\"priceList\":[],\"promoPriceList\":[]},\"message\":\"Update successful\"}"]
+[2025-10-23 23:34:39] debug: Parsed JSON (matched): {"statusCode":200,"payload":{"mpid":118102,"vpCode":"EP03F","mpCode":"UC-EP03","fulfillmentPolicy":"Stock","inStock":true,"inventory":23,"pht":1,"priceList":[],"promoPriceList":[]},"message":"Update successful"}
+[2025-10-23 23:34:39] info: 🟣 ===== End /products/updateInventory Request =====
+
+[2025-10-23 23:34:39] info: ✅ Inventory updated in DB for SKU EP03F
