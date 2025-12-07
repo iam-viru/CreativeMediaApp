@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Settings</title>
+  <link rel="stylesheet" href="/css/output.css" />
+</head>
+<body class="bg-gray-100 min-h-screen font-sans relative">
+
+  <!-- Toast -->
+  <% if (typeof status !== 'undefined' && status) { %>
+    <div class="fixed top-4 right-4 z-50">
+      <% if (status === 'success') { %>
+        <div class="bg-green-500 text-white px-4 py-2 rounded shadow">
+          ✅ Settings saved successfully.
+        </div>
+      <% } else if (status === 'error') { %>
+        <div class="bg-red-500 text-white px-4 py-2 rounded shadow">
+          ❌ Error saving settings. Please try again.
+        </div>
+      <% } %>
+    </div>
+  <% } %>
+
+  <!-- Navbar (same as other pages) -->
+  <nav class="bg-white shadow sticky top-0 z-40 w-full border-b border-gray-200">
+    <div class="w-full flex justify-between items-center px-8 py-3">
+      <div class="flex items-center gap-6">
+        <h1 class="text-xl font-semibold text-gray-800">Net32 Dashboard</h1>
+        <a href="/products" class="text-gray-700 hover:text-blue-600 font-medium">Products</a>
+        <a href="/users" class="text-gray-700 hover:text-blue-600 font-medium">Users</a>
+        <a href="/settings" class="text-blue-600 font-semibold border-b-2 border-blue-600 pb-1">
+          Settings
+        </a>
+      </div>
+      <div class="flex items-center gap-3">
+        <img src="<%= user.profile_image || '/images/default-avatar.png' %>"
+             alt="User Avatar"
+             class="w-9 h-9 rounded-full border border-gray-300 object-cover" />
+        <span class="text-gray-700 font-medium"><%= user.name || user.username %></span>
+        <a href="/logout"
+           class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition">
+          Logout
+        </a>
+      </div>
+    </div>
+  </nav>
+
+<!-- Main Content -->
+<div class=" flex justify-center mt-10 px-4">
+  <div class="max-w-xl bg-white shadow-md rounded-lg p-8 border border-gray-200">
+
+    <h2 class="text-xl font-semibold text-gray-800 mb-6">
+      Net32 Settings
+    </h2>
+
+    <form action="/settings" method="POST" class="space-y-6">
+
+  <!-- Username -->
+  <div>
+    <label class="block text-sm font-medium text-gray-700 mb-1">
+      Net32 Username
+    </label>
+    <input
+      type="text"
+      name="net32_username"
+      value="<%= settings.net32_username || '' %>"
+      class="border rounded px-3 py-2 w-80 max-w-full
+             focus:outline-none focus:ring-2 focus:ring-blue-500"
+      required />
+  </div>
+
+  <!-- Password -->
+  <div>
+    <label class="block text-sm font-medium text-gray-700 mb-1">
+      Net32 Password
+    </label>
+    <input
+      type="password"
+      name="net32_password"
+      value="<%= settings.net32_password || '' %>"
+      class="border rounded px-3 py-2 w-80 max-w-full
+             focus:outline-none focus:ring-2 focus:ring-blue-500"
+      required />
+  </div>
+
+  <!-- Max Price Breaks -->
+  <div>
+    <label class="block text-sm font-medium text-gray-700 mb-1">
+      Max Price Breaks
+    </label>
+    <input
+      type="number"
+      name="max_price_breaks"
+      min="1"
+      max="10"
+      value="<%= settings.max_price_breaks || 5 %>"
+      class="border rounded px-3 py-2 w-32
+             focus:outline-none focus:ring-2 focus:ring-blue-500" />
+
+    <p class="text-xs text-gray-500 mt-1">
+      This controls how many price break rows the system uses when auto-filling.
+    </p>
+  </div>
+
+  <!-- Save Button -->
+  <div class="pt-4">
+    <button
+      type="submit"
+      class="updateBtn bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
+      Save Settings
+    </button>
+  </div>
+
+</form>
+
+
+  </div>
+</div>
+
+   
+  <!-- Main Content Ends--> 
+
+
+    <!-- Script section Starts-->
+  <script>
+    // Toast auto-hide after 3 seconds
+    setTimeout(() => {
+      const toast = document.querySelector('.fixed.top-4.right-4');
+      if (toast) {
+        toast.remove();
+      }
+    }, 3000);
+  </script>
+  <!-- Script section Ends-->
+</body>
+</html>

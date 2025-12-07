@@ -198,7 +198,7 @@ const inv = inventory && !isNaN(inventory) && Number(inventory) > 0
         pb.interval,
         inv,
         pb.activeCd ?? 1, // ✅ Active per price break
-        new Date(),
+        new Date()
       ]);
 
       const insertSql = `
@@ -646,12 +646,7 @@ exports.updateInventory = async (req, res) => {
     }
   });
 };
-
-
-
-
-
-
+ 
 // ===================== UPDATE INVENTORY ENDS =====================
 
 
