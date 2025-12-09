@@ -305,10 +305,9 @@
                                                       </td>
 
                                                       <!-- Last Update -->
-                                                      <td class="px-4 py-2 last-update">
-                                                       <!-- <%= new Date(p.last_update).toLocaleString() %>-->
-                                                        <%= p.last_update 
-                                                          ? new Date(p.last_update).toLocaleString("en-US", { timeZone: "America/Los_Angeles" }) 
+                                                      <td class="px-4 py-2 last-update"> 
+                                                        <%= p.last_price_update 
+                                                          ? new Date(p.last_price_update).toLocaleString("en-US", { timeZone: "America/Los_Angeles" }) 
                                                           : "—" 
                                                          %>
 
