@@ -96,7 +96,7 @@ exports.updateProduct = (req, res) => {
 };
 // Batch update (multi-row form submission)
 exports.batchUpdate = (req, res) => {
-  console.log('Batch update request body:', req.body);
+  //console.log('Batch update request body:', req.body);
   const { id, qty, minimum_price, update_hours,  
     update_minutes, selected } = req.body;
 
@@ -252,19 +252,75 @@ const inv = inventory && !isNaN(inventory) && Number(inventory) > 0
 // ===================== ADD NEW PRODUCT ENDS=====================
 
 // ===================== DELETE PRODUCT =====================
-exports.deleteProduct = (req, res) => {
+/*exports.deleteProduct = (req, res) => {
   const { id } = req.params;
-  if (!id) return res.redirect('/products?status=error');
+  const { qty } = req.body;
 
-  const sql = 'DELETE FROM products WHERE id = ?';
-  db.query(sql, [id], (err) => {
+  console.log("🗑 Delete request:", { id, qty });
+  console.log("🗑 DELETE REQUEST RECEIVED");
+  console.log("ID:", id);
+  console.log("QTY:", qty);
+  console.log("TYPE OF QTY:", typeof qty);
+  if (!id || qty === undefined) {
+    console.error("❌ Missing id or qty");
+    //return res.redirect("/products");
+  }
+
+  const sql = 'DELETE FROM products WHERE id = ? AND qty = ?';
+  console.log('🧪 SQL:', sql);
+  console.log('🧪 PARAMS:', [id, qty]);
+  db.query(sql, [id,qty], (err, result) => {
     if (err) {
       console.error('Delete error:', err);
       return res.redirect('/products?status=error');
     }
+   console.log('✅ Query result:', result);
     return res.redirect('/products?status=success');
   });
+};*/
+
+// ===================== DELETE PRODUCT =====================
+exports.deleteProduct = (req, res) => {
+  const { id } = req.params;
+
+  console.log("🗑 Delete request:", { id });
+
+  if (!id) {
+    return res.status(400).json({
+      success: false,
+      message: "Missing product id"
+    });
+  }
+
+  // ✅ Delete by ID only (ID is unique)
+  const sql = 'DELETE FROM products WHERE id = ?';
+  console.log('🧪 SQL:', sql);
+  console.log('🧪 PARAMS:', [id]);
+
+  db.query(sql, [id], (err, result) => {
+    if (err) {
+      console.error('❌ Delete error:', err);
+      return res.status(500).json({
+        success: false,
+        message: 'Database error while deleting'
+      });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found'
+      });
+    }
+
+    console.log('✅ Product deleted:', result);
+    return res.json({
+      success: true,
+      message: 'Product deleted successfully'
+    });
+  });
 };
+
 
 // ===================== FETCH PRODUCT DATA FROM EXTERNAL API =====================
   exports.fetchProduct = async (req, res) => {
